@@ -1729,7 +1729,7 @@ function CompactNumberToInteger(compactString) {
 //#endregion
 
 //#region Currency conversion
-const debugTurnOffCurrencyApi = true
+const debugTurnOffCurrencyApi = false
 const currencyApiLink = "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur.json"
 let currencyValueData = {}
 
