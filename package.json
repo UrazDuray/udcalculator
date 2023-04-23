@@ -1,0 +1,17 @@
+{
+  "name": "udcalculator",
+  "version": "1.2.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-packager . ud-calculator --overwrite --prune=true --platform=win32 --arch=x64 --asar --icon AppIcon.ico"
+  },
+  "author": "UrazDuray",
+  "license": "ISC",
+  "dependencies": {
+    "custom-electron-titlebar": "^3.2.6",
+    "electron": "^24.1.2",
+    "electron-packager": "^16.0.0"
+  }
+}
