@@ -10,7 +10,6 @@
   "author": "UrazDuray",
   "license": "ISC",
   "dependencies": {
-    "custom-electron-titlebar": "^3.2.6",
     "electron": "^24.1.2",
     "electron-packager": "^16.0.0"
   }
