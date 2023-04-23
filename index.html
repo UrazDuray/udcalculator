@@ -33,9 +33,10 @@
             </div>
             <div class="scrollBarY" id="ApplicationsAreaDiv">
                 <Button style="color: #69daff;" onclick="AdditionalMenuToggle(true, 0)" class="AppButtonClass">?</Button>
-                <Button style="color: #FFA869; padding: 15px;" onclick="AdditionalMenuToggle(true, 1)" class="AppButtonClass"><img src="source/settings_icon.png" alt="settings"></Button>
+                <Button style="padding: 15px;" onclick="AdditionalMenuToggle(true, 1)" class="AppButtonClass"><img src="source/settings_icon.png" alt="settings"></Button>
                 <Button style="color: #7fff69" onclick="AdditionalMenuToggle(true, 2)" class="AppButtonClass">£</Button>
-                <Button style="color: #FFA869; padding: 15px;" onclick="AdditionalMenuToggle(true, 3)" class="AppButtonClass"><img src="source/electric_icon.png" alt="settings"></Button>
+                <Button style="padding: 15px;" onclick="AdditionalMenuToggle(true, 3)" class="AppButtonClass"><img src="source/electric_icon.png" alt="settings"></Button>
+                <Button style="padding: 15px;" onclick="AdditionalMenuToggle(true, 4)" class="AppButtonClass"><img src="source/color_icon.png" alt="settings"></Button>
             </div>
             <div id="AdditionalMenusDiv">
                 <div class="AdditionalMenuCloseClass AdditionalMenuClass scrollBarY" id="helpMenu">
@@ -102,6 +103,11 @@
                         </div>
                         
                     </div>
+                </div>
+                <div class="AdditionalMenuCloseClass AdditionalMenuClass scrollBarY" id="colorMenu">
+                    <button onclick="AdditionalMenuToggle(false, 4)" class="AdditionalMenuCloseButton">❌</button>
+                    <div class="TitleDivClass">Colors</div>
+                    <input type="color">
                     
                 </div>
             </div>
