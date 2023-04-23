@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css">
+        <title>UDCalculator</title>
+    </head>
+    <body>
+        <div onclick="StopQueuedNotifications()" id="InAppNotificationDiv">
+            <span style="transition-duration: 250ms; opacity: 1;position: fixed; left: 50px; right: 50px;" id="InAppNotificationTitle"></span>
+            <span style="transition-duration: 500ms; opacity: 0;position: fixed; left: 50px; right: 50px;" id="InAppNotificationContent"></span>
+        </div>
+        <div id="GridContainer">
+            <div id="CalculatorAreaDiv">
+                <div spellcheck="false" oninput="CalculatorOnInput(this.textContent, true)" contenteditable="true" id="CalculatorInputDiv"></div>
+            </div>
+            <div id="CalculatorResultAreaDiv">
+                <span id="resultSpan"></span>
+            </div>
+            <div onclick="ToggleWindowOverMode()" title="Enable window over mode" id="WindowOverModeButtonAreaDiv">
+                <div>
+                    <div class="WindowOverModeRectangleClass" id="WindowOverModeFirstRectangle"></div>
+                    <div class="WindowOverModeRectangleClass" id="WindowOverModeSecondRectangle"></div>
+                </div>
+            </div>
+            <div class="scrollBarY" id="CustomVariablesAreaDiv">
+                <div id="CustomVariablesDiv">
+                    <div id="CustomVariablesListDiv"></div>
+                    <button onclick="AddCustomVariable()" id="AddCustomVariableButton">+</button>
+                </div>
+            </div>
+            <div class="scrollBarY" id="ApplicationsAreaDiv">
+                <Button style="color: #69daff;" onclick="AdditionalMenuToggle(true, 0)" class="AppButtonClass">?</Button>
+                <Button style="color: #FFA869; padding: 15px;" onclick="AdditionalMenuToggle(true, 1)" class="AppButtonClass"><img src="source/settings_icon.png" alt="settings"></Button>
+                <Button style="color: #7fff69" onclick="AdditionalMenuToggle(true, 2)" class="AppButtonClass">£</Button>
+                <Button style="color: #FFA869; padding: 15px;" onclick="AdditionalMenuToggle(true, 3)" class="AppButtonClass"><img src="source/electric_icon.png" alt="settings"></Button>
+            </div>
+            <div id="AdditionalMenusDiv">
+                <div class="AdditionalMenuCloseClass AdditionalMenuClass scrollBarY" id="helpMenu">
+                    <button onclick="AdditionalMenuToggle(false, 0)" class="AdditionalMenuCloseButton">❌</button>
+                    <div class="helpMenuListColumnNamesClass" id="helpMenuListColumnNames">
+                        <span class="helpItemClassCategoryClass">Symbols</span>
+                        <span class="helpItemClassCategoryClass">Operation</span>
+                        <span class="helpItemClassCategoryClass">Examples</span>
+                        <span class="helpItemClassCategoryClass">Description</span>
+                    </div>
+                    <div id="helpMenuList"></div>
+                </div>
+                <div class="AdditionalMenuCloseClass AdditionalMenuClass scrollBarY" id="settingsMenu">
+                    <button onclick="AdditionalMenuToggle(false, 1)" class="AdditionalMenuCloseButton">❌</button>
+                    <div class="TitleDivClass">Settings</div>
+                    <span style="margin-top: 20px; display: block;" class="SubTitleSpanClass">Version</span>
+                    <div style="display: flex; padding: 40px;" name="version">
+                        <span id="currentVersionSpan"></span>
+                        <div onclick="window.ipcControls.openExternalLinkLatestRelease()" style="display: none;" id="newUpdateDiv">New Update!</div>
+                    </div>
+                    
+                </div>
+                <div class="AdditionalMenuCloseClass AdditionalMenuClass scrollBarY" id="currencyMenu">
+                    <button onclick="AdditionalMenuToggle(false, 2)" class="AdditionalMenuCloseButton">❌</button>
+                    <div class="TitleDivClass">Currency Conversion</div>
+                    <div style="display: flex; justify-content: center; margin-top: 40px;" name="curency conversion">
+                        <select oninput="CalculateCurrency()" class="selectBoxClass" id="currencySelectBox1"></select>
+                        <input oninput="CalculateCurrency('1')" style="margin-left: 10px;" class="inputTextClass" id="currencyInput1" type="text">
+                        <span style="font-size: 35px; margin-left: 10px;">=</span>
+                        <input oninput="CalculateCurrency('2')" style="margin-left: 10px;" class="inputTextClass" id="currencyInput2" type="text">
+                        <select oninput="CalculateCurrency()" style="margin-left: 10px;" class="selectBoxClass" id="currencySelectBox2"></select>
+                    </div>
+                </div>
+                <div class="AdditionalMenuCloseClass AdditionalMenuClass scrollBarY" id="electricalMenu">
+                    <button onclick="AdditionalMenuToggle(false, 3)" class="AdditionalMenuCloseButton">❌</button>
+                    <div class="TitleDivClass">Electrical</div>
+                    <div name="resistor calculation" style="text-align: center;">
+                        <span style="margin-top: 20px; display: block;" class="SubTitleSpanClass">Resistor Calculator</span>
+                        <select oninput="ResistorBandCountChanger(this.value)" style="margin-top: 20px;" class="selectBoxClass" name="Band Count" id="resistorBandSelect">
+                            <option value="3">3 Bands</option>
+                            <option selected="selected" value="4">4 Bands</option>
+                            <option value="5">5 Bands</option>
+                            <option value="6">6 Bands</option>
+                        </select>
+                        <div id="resistorCalculatorDiv">
+                            <div style="border-radius: 10px 0 0 10px;" class="resitorBodyLegClass"></div>
+                            <div id="resitorBodyDiv"></div>
+                            <div style="border-radius: 0 10px 10px 0;" class="resitorBodyLegClass"></div>
+                        </div>
+                        <div id="resistorCalculatorResultDiv" style="margin-top: 40px; display: flex; justify-content: space-evenly;">
+                            <div>
+                                <div oninput="CalculateResistorFromValue()" contenteditable="true" id="resistorCalculatorResultResistance" class="resistorCalculatorResultDivsClass"></div>
+                                <span style="font-size: 30px; padding: 10px 0 10px 0;">Ω</span>
+                            </div>
+                            <div>
+                                <span style="font-size: 30px; padding: 10px 0 10px 0;">±</span>
+                                <div oninput="CalculateResistorFromValue()" contenteditable="true" id="resistorCalculatorResultTolerance" class="resistorCalculatorResultDivsClass"></div>
+                                <span style="font-size: 30px; padding: 10px 0 10px 0;">%</span>
+                            </div>
+                            <div> 
+                                <div oninput="CalculateResistorFromValue()" contenteditable="true" id="resistorCalculatorResultTempCoeff" class="resistorCalculatorResultDivsClass"></div>
+                                <span style="font-size: 30px; padding: 10px 0 10px 0;">ppm/°C</span>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+    </body>
+    <script src="script.js"></script>
+    <script src="check_version.js"></script>
+</html>
