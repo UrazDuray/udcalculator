@@ -35,7 +35,7 @@ const createWindow = () => {
 
   win.loadFile('index.html');
   //toolbarı kapa
-  win.removeMenu()
+  //win.removeMenu()
   // DevTools'u aç.
   win.webContents.openDevTools()
 };

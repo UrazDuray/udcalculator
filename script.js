@@ -937,6 +937,7 @@ function AdditionalMenuToggle(open, index){
     
 }
 
+
 //#region Help Menu
 const helpButton = document.getElementById("helpButton")
 const helpMenu = document.getElementById("helpMenu")
@@ -1853,5 +1854,59 @@ function StopQueuedNotifications(){
 //#endregion
 
 //#region History
+
+
+
+
+function getOperationHistory(){
+    if(sessionStorage.getItem("operationHistory")!==null){
+        return JSON.parse(sessionStorage.getItem("operationHistory"))
+    }else{
+        sessionStorage.setItem("operationHistory",JSON.stringify([]))
+        return JSON.parse(sessionStorage.getItem("operationHistory"))
+    }
+}
+
+function addToOperationHistory(operation,result){
+    var operationHistory = getOperationHistory()
+    operationHistory.push([operation,result])
+    sessionStorage.setItem("operationHistory", JSON.stringify(operationHistory))
+}
+
+function removeFromOperationHistory(operation){
+
+    var operationHistory = getOperationHistory()
+    var tempOperationHistory=operationHistory.map(e=>e[0])
+
+    if(typeof operation === "integer"){                 //indexle silmek istersen
+        if(operationHistory.length>operation){
+            operationHistory.splice(operation,1)
+        }else{
+            console.log("index historyde yok")
+        }
+    }
+    else if(typeof operation === "string"){             //operasyonun kendisiyle silmek istersen
+        if(tempOperationHistory.indexOf(operation)!=-1){
+            operationHistory.splice(tempOperationHistory.indexOf(operation),1)
+        }else{
+            console.log("operasyon historyde yok")
+        }
+    }
+    sessionStorage.setItem("operationHistory", JSON.stringify(operationHistory))
+}
+
+document.addEventListener("keydown",(e)=>{   
+    if(e.key=="Enter" && CalculatorInputDivElement.matches(':focus')){   //ikinci kondisyon input fokuslumu die bakıo
+        addToOperationHistory(CalculatorInputDivElement.innerHTML,resultSpanElement.innerHTML)
+        console.log(getOperationHistory())
+    }
+})
+
+
+
+
+
+
+
 //#endregion
 
