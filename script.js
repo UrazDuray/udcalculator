@@ -22,7 +22,7 @@ const operationsData = [
     //{operation: "convertToVector", symbols: ["vec", "vector"], category: "function", examples: ["vec([#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>cross<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z})"], color: "#6dfc74", description: "Different way of declaring vector", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 3},
 
     //vectors
-    {operation: "crossProduct", symbols: ["crossp"], category: "vector", operationApplianceType: "twoNumbers", examples: ["<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>cross<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Takes cross product of two vectors", priority: 9, vectorCountNeededForOperation: [2]},
+    {operation: "crossProduct", symbols: ["crossp"], category: "vector", operationApplianceType: "twoNumbers", examples: ["<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>crossp<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Takes cross product of two vectors", priority: 9, vectorCountNeededForOperation: [2]},
     {operation: "dotProduct", symbols: ["dotp"], category: "vector", operationApplianceType: "twoNumbers", examples: ["<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>dotp<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Takes dot product of two vectors", priority: 9, vectorCountNeededForOperation: [2]},
     {operation: "magnitudeOfVector", symbols: ["mag", "magnitude"], category: "vector", operationApplianceType: "numberOnRight", examples: ["mag<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Calculates the length of the vector", priority: 9, vectorCountNeededForOperation: [1]},
     {operation: "unitVectorOfVector", symbols: ["unit"], category: "vector", operationApplianceType: "numberOnRight", examples: ["unit<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Calculates the unit vector of the vector", priority: 9, vectorCountNeededForOperation: [1]},
@@ -1724,14 +1724,15 @@ const CompactNumberEquivalentValues = {
 function CompactNumberToInteger(compactString) {
     if(compactString.length < 1){ return}
     
-    const number = parseInt(compactString.slice(0, -1));
-    const unit = compactString.slice(-1);
+    const number = parseFloat(compactString.slice(0, -1));
+    const unit = compactString.slice(-1).toUpperCase();
     
-    if (CompactNumberEquivalentValues.hasOwnProperty(unit.toUpperCase())) {
+    if (CompactNumberEquivalentValues.hasOwnProperty(unit)) {
+
         return number * CompactNumberEquivalentValues[unit]
     } 
     else {
-        return parseInt(compactString)
+        return parseFloat(compactString)
     }
 }
 
@@ -1851,12 +1852,8 @@ function StopQueuedNotifications(){
 }
 //#endregion
 
-//#region History
-
-
-
-
-function getOperationHistory(){
+//#region Saved History
+function GetSavedHistory(){
     if(sessionStorage.getItem("operationHistory")!==null){
         return JSON.parse(sessionStorage.getItem("operationHistory"))
     }else{
@@ -1865,15 +1862,15 @@ function getOperationHistory(){
     }
 }
 
-function addToOperationHistory(operation,result){
-    var operationHistory = getOperationHistory()
+function AddToSavedHistory(operation,result){
+    var operationHistory = GetSavedHistory()
     operationHistory.push([operation,result])
     sessionStorage.setItem("operationHistory", JSON.stringify(operationHistory))
 }
 
-function removeFromOperationHistory(operation){
+function RemoveFromSavedHistory(operation){
 
-    var operationHistory = getOperationHistory()
+    var operationHistory = GetSavedHistory()
     var tempOperationHistory=operationHistory.map(e=>e[0])
 
     if(typeof operation === "integer"){                 //indexle silmek istersen
@@ -1895,16 +1892,10 @@ function removeFromOperationHistory(operation){
 
 document.addEventListener("keydown",(e)=>{   
     if(e.key=="Enter" && CalculatorInputDivElement.matches(':focus')){   //ikinci kondisyon input fokuslumu die bakıo
-        addToOperationHistory(CalculatorInputDivElement.innerHTML,resultSpanElement.innerHTML)
-        console.log(getOperationHistory())
+        AddToSavedHistory(CalculatorInputDivElement.innerHTML,resultSpanElement.innerHTML)
+        console.log(GetSavedHistory())
     }
 })
-
-
-
-
-
-
 
 //#endregion
 

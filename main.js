@@ -29,13 +29,11 @@ const createWindow = () => {
     shell.openExternal('https://github.com/UrazDuray/udcalculator/releases/tag/1.1.0')
   })
 
-
-
   win.setAlwaysOnTop(false);
 
   win.loadFile('index.html');
   //toolbarı kapa
-  //win.removeMenu()
+  win.removeMenu()
   // DevTools'u aç.
   win.webContents.openDevTools()
 };
