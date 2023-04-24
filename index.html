@@ -108,10 +108,35 @@
                 <div class="AdditionalMenuCloseClass AdditionalMenuClass scrollBarY" id="colorsMenu">
                     <button onclick="AdditionalMenuToggle(false, 4)" class="AdditionalMenuCloseButton">❌</button>
                     <div class="TitleDivClass">Colors</div>
+                    <div style="text-align: center; margin-top: 30px;" name="color picker">
+                        <span class="SubTitleSpanClass">Color Picker</span> 
+                        <br>
+                        <div id="colorPickerDiv">
+                            <div id="colorPickerValueDiv"></div>
+                            <canvas id="colorPickerPalette" height="300" width="300"></canvas>
+                            <canvas id="hueStrip" height="300" width="30"></canvas>
+                        </div>
+                        <div style="display: flex; justify-content: center; margin-top: 20px;">
+                            <div style="display: grid; text-align: center; margin: 0 3vw 0 3vw;">
+                                <span style="font-size: 30px; margin-bottom: 10px;">Rgb</span>
+                                <input oninput="ColorPickerValueInput(this.value, 'rgb')" style="text-align: center;" id="colorPickerValueRgb" class="inputTextClass" type="text">
+                            </div>
+                            <div style="display: grid; text-align: center; margin-right: 3vw;">
+                                <span style="font-size: 30px; margin-bottom: 10px;">Hex</span>
+                                <input oninput="ColorPickerValueInput(this.value, 'hex')" style="text-align: center;" id="colorPickerValueHex" class="inputTextClass" type="text">
+                            </div>
+                            <div style="display: grid; text-align: center; margin-right: 3vw;">
+                                <span style="font-size: 30px; margin-bottom: 10px;">Hsv</span>
+                                <input oninput="ColorPickerValueInput(this.value, 'hsv')" style="text-align: center;" id="colorPickerValueHsv" class="inputTextClass" type="text">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </body>
     <script src="script.js"></script>
+    <script src="scripts/generalFunctions.js"></script>
+    <script src="scripts/drawColorPicker.js"></script>
     <script src="check_version.js"></script>
 </html>
