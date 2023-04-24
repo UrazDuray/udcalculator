@@ -8,16 +8,17 @@ To do:
 - calculation inside variable value
 - add hsl to color picker
 - add favorite colors
-- random atar func
 - sayıdan sayıya çarpan func
 
+
 functions:
-- vec()
 - vecrossp problemi
-- vec() içi eksi algılamıyo
 
 
 Added:
 - Added color picker
 - Added sum of numbers in range
 - Fixed a bug causing factorial - factorial to return an incorrect result
+- Added functions
+- Added vec(x,y,z) different way of declaring vector
+- Added rand(x, y) random between range

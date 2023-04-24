@@ -22,6 +22,7 @@ const operationsData = [
     //functions
     {operation: "convertToVector", symbols: ["vec", "vector"], category: "function", examples: ["vec([#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z})"], color: "#6dfc74", description: "Different way of declaring vector", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 3},
     {operation: "sumOfRange", symbols: ["sum"], category: "function", examples: ["sum([#36c1f7]{x}, [#36c1f7]{y})"], color: "#6dfc74", description: "Sum between the range. Both ends are included", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 2},
+    {operation: "randomOfRange", symbols: ["rand", "random"], category: "function", examples: ["rand([#36c1f7]{x}, [#36c1f7]{y})"], color: "#6dfc74", description: "Returns an integer between the range. Both ends are included.", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 2},
 
     //vectors
     {operation: "crossProduct", symbols: ["crossp"], category: "vector", operationApplianceType: "twoNumbers", examples: ["<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>crossp<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Takes cross product of two vectors", priority: 9, vectorCountNeededForOperation: [2]},
@@ -499,6 +500,8 @@ function ApplyOperation(operation, nums, vectorMode){
             return FunctionToVectorConversion(nums)
         case "sumOfRange":
             return SumOfRangeFunction(nums[0], nums[1])
+        case "randomOfRange":
+            return RandomOfRangeFunction(nums[0], nums[1])
         default:
             return undefined
     }
@@ -1478,6 +1481,10 @@ function SumOfRangeFunction(start, end){
     return SumFromZeroToN(end) - SumFromZeroToN(start - 1);
 }
 
+function RandomOfRangeFunction(min, max){
+    return Math.round(Math.random() * (max - min) + min)
+}
+
 //#endregion
 
 //#region Resistor calculation
@@ -1987,7 +1994,7 @@ function RemoveFromSavedHistory(operation){
 }
 
 document.addEventListener("keydown",(e)=>{   
-    if(e.key=="Enter" && CalculatorInputDivElement.matches(':focus')){   //ikinci kondisyon input fokuslumu die bakıo
+    if(e.key=="s" && e.ctrlKey && CalculatorInputDivElement.matches(':focus')){   //ikinci kondisyon input fokuslumu die bakıo
         AddToSavedHistory(CalculatorInputDivElement.innerHTML,resultSpanElement.innerHTML)
         console.log(GetSavedHistory())
     }
