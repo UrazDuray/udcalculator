@@ -443,7 +443,7 @@ body{
     width: calc(100vw - var(--additional-menu-margin)*2);
     
 }
-.resitorBodyLegClass{
+.resistorBodyLegClass{
     width: 10vw;
     max-width: 150px;
     height: 10vh;
@@ -452,7 +452,7 @@ body{
     
 }
 
-#resitorBodyDiv{
+#resistorBodyDiv{
     width: 70vw;
     max-width: 700px;
     height: 40vh;

@@ -1384,7 +1384,7 @@ function FunctionToVectorConversion(nums){
 //#endregion
 
 //#region Resistor calculation
-const resitorBodyDivElement = document.getElementById("resitorBodyDiv")
+const resistorBodyDivElement = document.getElementById("resistorBodyDiv")
 
 const resistorBandCountConfiguration = [
     {bandCount: 3, configuration: ["digit", "digit", "multiplier"]},
@@ -1403,7 +1403,7 @@ const resistorColorsData = {"black":"#000000", "brown":"#663232", "red":"#ff0000
 
 // add all resistors
 for (let i = 0; i < 6; i++) {
-    resitorBodyDivElement.innerHTML += 
+    resistorBodyDivElement.innerHTML += 
     `<div onmouseenter="ResistorBandStateChange(${i}, true)" onmouseleave="ResistorBandStateChange(${i}, false)" class="resistorBandClass">
     </div>`
 }  
@@ -1415,19 +1415,19 @@ function ResistorBandCountChanger(value){
     const bandCountConfig = resistorBandCountConfiguration.find(x => x.bandCount == value).configuration
 
     for (let i = 0; i < 6; i++) {
-        resitorBodyDivElement.children[i].innerHTML = ""
+        resistorBodyDivElement.children[i].innerHTML = ""
         if(i >= value){
-            resitorBodyDivElement.children[i].style.display = "none"
+            resistorBodyDivElement.children[i].style.display = "none"
         }
         else{
-            resitorBodyDivElement.children[i].style.display = "grid"
+            resistorBodyDivElement.children[i].style.display = "grid"
             const bandType = bandCountConfig[i];
             const colors = resistorBandCountColorsConfiguration.find(x => x.bandType == bandType).colors
 
             for (let a = 0; a < colors.length; a++) {
                 const color = colors[a];
                 const styleAddition = color == "black" ? "color: rgb(200,200,200)" : ""
-                resitorBodyDivElement.children[i].innerHTML += `<button onclick="ResistorBandColorChosen(${i}, this.style.backgroundColor)" style="background-color: ${resistorColorsData[color]}; opacity: 0;${styleAddition}" class="resistorBandColorButtonClass">${color}</button>`
+                resistorBodyDivElement.children[i].innerHTML += `<button onclick="ResistorBandColorChosen(${i}, this.style.backgroundColor)" style="background-color: ${resistorColorsData[color]}; opacity: 0;${styleAddition}" class="resistorBandColorButtonClass">${color}</button>`
             }
         }
     }
@@ -1472,19 +1472,19 @@ function ResistorBandColorChosen(resistorId, color){
 
 function ResistorBandColorUpdate(resistorId, color){
 
-    resitorBodyDivElement.children[resistorId].style.backgroundColor = color
+    resistorBodyDivElement.children[resistorId].style.backgroundColor = color
     StopResistorBandChoosing(resistorId)
 }   
 
 function StopResistorBandChoosing(resistorId){
-    for (let i = 0; i < resitorBodyDivElement.children[resistorId].children.length; i++) {
-        const child = resitorBodyDivElement.children[resistorId].children[i];
+    for (let i = 0; i < resistorBodyDivElement.children[resistorId].children.length; i++) {
+        const child = resistorBodyDivElement.children[resistorId].children[i];
         child.style.opacity = "0"
     } 
 }
 function StartResistorBandChoosing(resistorId){
-    for (let i = 0; i < resitorBodyDivElement.children[resistorId].children.length; i++) {
-        const child = resitorBodyDivElement.children[resistorId].children[i];
+    for (let i = 0; i < resistorBodyDivElement.children[resistorId].children.length; i++) {
+        const child = resistorBodyDivElement.children[resistorId].children[i];
         child.style.opacity = "1"
     } 
 }
@@ -1528,7 +1528,7 @@ function CalculateResistorFromColor() {
 
     let enteredIndexes = []
     for (let i = 0; i < bandCount; i++) {
-        const child = resitorBodyDivElement.children[i];
+        const child = resistorBodyDivElement.children[i];
         const c = child.style.backgroundColor == "" ? "rgb(0,0,0)" : child.style.backgroundColor
         colors[i] = getKeyByValue(resistorColorsData,rgba2hex(c))
         colorValues[i] = resistorColorDigits.indexOf(colors[i])
