@@ -8,6 +8,7 @@ let lastCalculatorInput = ""
 const placeHolderChar = "~" // used as a placeholder in code it cant be used
 
 const CalculatorInputDivElement = document.getElementById("CalculatorInputDiv")
+const argSplitter = ','
 
 const operationsData = [
     {operation: "primeCheck", symbols: ["prime"], category: "primeCheck", operationApplianceType: "numberOnRight", examples: ["prime[#36c1f7]{x}"], color: "#6dfc74", description: "Checks if the number is prime. If it is it returns 1 if not 0", priority: 10, vectorCountNeededForOperation: [0]},
@@ -19,7 +20,7 @@ const operationsData = [
     {operation: "conversion", symbols: ["to"], category: "unitConversion", operationApplianceType: "numberOnLeft", examples: ["[#36c1f7]{x}[#ad6dfc]{U}to[#ad6dfc]{U}"], color: "#6dfc74", description: "Converts units", priority: 10, vectorCountNeededForOperation: [0]},
 
     //functions
-    //{operation: "convertToVector", symbols: ["vec", "vector"], category: "function", examples: ["vec([#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>cross<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z})"], color: "#6dfc74", description: "Different way of declaring vector", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 3},
+    {operation: "convertToVector", symbols: ["vec", "vector"], category: "function", examples: ["vec([#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>cross<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z})"], color: "#6dfc74", description: "Different way of declaring vector", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 3},
 
     //vectors
     {operation: "crossProduct", symbols: ["crossp"], category: "vector", operationApplianceType: "twoNumbers", examples: ["<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>crossp<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Takes cross product of two vectors", priority: 9, vectorCountNeededForOperation: [2]},
@@ -145,6 +146,8 @@ function CalculatorOnInput(input, restoreCursorPlace){
     
     //find vectors
     let vectorsOrdered = FindVectors(input)
+
+    //input = EditInputForFunctions(input)
     
     // Find orderedOperations
     orderedByParantheseArray.forEach(e => {
@@ -178,6 +181,16 @@ function CalculatorOnInput(input, restoreCursorPlace){
     // Find numbers
     let numbersOrdered = FindNumbers(input, [...orderedOperations]).concat(vectorsOrdered)
     let orderedOperationsAndNumbers = orderedOperations.concat(numbersOrdered)
+
+    //find arg splitters
+    for (let i = 1; i < input.length; i++) {
+        const char = input[i];
+        if(char == argSplitter){
+            orderedOperationsAndNumbers.push({argSplitter: true, index: i-1})
+        }
+    }
+
+    //sort it by index ascending order
     orderedOperationsAndNumbers = orderedOperationsAndNumbers.sort(({index:a}, {index:b}) => a-b)
     
     //remove custom variables from ordered operations
@@ -198,7 +211,7 @@ function CalculatorOnInput(input, restoreCursorPlace){
         const nextElement = t_OOAN2[i+1]
         const prevElement = t_OOAN2[i-1]
         
-        if(!(i == 0 || (prevElement && prevElement.operation))){ continue }
+        if(!(i == 0 || (prevElement && (prevElement.operation || prevElement.argSplitter)))){ continue }
         // Check operation specific properties
         switch (e.operation) {
             case "substract":{
@@ -240,6 +253,7 @@ function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
     input = input.substring(1, input.length-1) //remove ghost parantheses
     unitsToColorize = []
     let resultToReturn
+    
     for (let i = 0; i < orderedOperations.length; i++) {
         const e = orderedOperations[i]
         
@@ -250,7 +264,27 @@ function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
         let currentOperationData = operationsData.find(x => x.operation == currentOperation.operation)
         let currentOperationApplianceType = currentOperationData.operationApplianceType
     
-        if(currentOperationApplianceType == "twoNumbers" && !currentOperation.passThisOperation){
+        if(currentOperationData.category == "function"){
+            let numsArray = []
+            let argCounter = 1
+            let argIterator = 1
+            while(argCounter <= currentOperationData.argumentCount){
+                const num = orderedOperationsAndNumbers[currentOperationIndex + argIterator];
+                if(num == undefined){ ThrowErrorCode("Incorrect use of function"); return }
+                argIterator++
+                if(num.argSplitter) continue
+                numsArray.push(num.number)
+                argCounter++
+            }
+        
+            const result = ApplyOperation(currentOperation, numsArray, false)
+            let objectToAdd = {number: result, index: currentOperationIndex}
+            if(typeof result == "object") objectToAdd.vector = true
+            orderedOperationsAndNumbers.splice(currentOperationIndex, numsArray.length*2, objectToAdd) // numsArray.length*2 -1 + 1 -> arglar + splitter + 1(for ghost paranthese)
+            
+            resultToReturn = result
+        }
+        else if(currentOperationApplianceType == "twoNumbers" && !currentOperation.passThisOperation){
             const num1Element = orderedOperationsAndNumbers[currentOperationIndex - 1]
             let num2Element = orderedOperationsAndNumbers[currentOperationIndex + 1]
             if(num2Element == undefined){ ThrowErrorCode("Missing number"); return }
@@ -659,6 +693,56 @@ function FindVectors(input){
     }
     return vectorsOrdered
 }
+
+let functionsData = []
+operationsData.forEach( e => {
+    if(e.category == "function"){
+        functionsData.push(e)
+    }
+})
+
+// function EditInputForFunctions(input){
+//     let functionsFound = []
+//     functionsData.forEach(e => {
+//         let temporaryInput = input
+//         while (true) {
+//             symbolData = CheckIfStringIncludesStringsInArray(temporaryInput, e.symbols)
+//             if(symbolData == false){ break }
+//             let index = symbolData[0]
+//             let symbolString = symbolData[1]
+
+//             functionsFound.push({operation: e.operation, index: index - 1, symbol: symbolString, priority: e.priority}) //index + indexShift - 1: 1-> baştaki parantez için
+//             let symbolLength = symbolString.length
+//             temporaryInput = ReplaceWithPlaceHoldersAtIndex(temporaryInput, index, placeHolderChar, symbolLength)
+//         }
+//     });
+
+//     //find args of function
+//     let indexShift = 0
+//     for (let i = 0; i < functionsFound.length; i++) {
+//         const func = functionsFound[i];
+
+//         //find paranthese indexes
+//         const parantheseStartIndex = func.index + func.symbol.length + 1 + indexShift // +1 for the ghost paranthese at start
+//         if(input[parantheseStartIndex] != '('){ ThrowErrorCode("Incorrect use of function"); return }
+//         let parantheseEndIndex
+//         for (let a = parantheseStartIndex + 1; a < input.length; a++) {
+//             const char = input[a];
+//             if(char == ")"){
+//                 parantheseEndIndex = a
+//                 break
+//             }
+//         }
+//         if(parantheseEndIndex == undefined){ ThrowErrorCode("Incorrect use of function"); return }
+
+//         let oldArgsString = input.substring(parantheseStartIndex, parantheseEndIndex)
+//         let argsString = '(' + oldArgsString.replaceAll(',', '),(') + ')'
+//         input = input.substring(0, parantheseStartIndex) + argsString + input.substring(parantheseEndIndex)
+//         indexShift += argsString.length - oldArgsString.length
+//     }
+
+//     return input
+// }
 
 function ReplaceWithPlaceHoldersAtIndex(text, index, placeHolderChar, count){
     return text.substring(0, index) + placeHolderChar.repeat(count) + text.substring(index + count)

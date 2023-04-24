@@ -6,6 +6,11 @@ To do:
 - notification sağ alttan gelsin
 - notification yandan gözüküyor bug düzelt
 - calculation inside variable value
+- add hsl to color picker
+- add favorite colors
+- random atar func
+- sayıdan sayıya toplayan func
+- sayıdan sayıya çarpan func
 
 functions:
 - vec()
@@ -14,15 +19,4 @@ functions:
 
 
 Added:
-- Add degree to radian conversion
-- Mile unit
-- Added vectors and vector operations
-- vector sum
-- boş variable bug
-- currency conversion
-- negatif sayılar hala sıkıntılı
-- update ui
-- always on top modu
-- version
-- resistor calculator
-- settings
+- Added color picker
