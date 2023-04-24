@@ -588,7 +588,6 @@ function FindOperations(input, indexShift){
             const eComparedLimits = [eCompared.index, eCompared.index + eCompared.symbol.length]
             if(e == eCompared || operationsToBeDeleted.includes(eCompared)){ continue }
 
-            console.log(eLimits, eComparedLimits)
             if(eLimits[0] <= eComparedLimits[0] && eComparedLimits[1] <= eLimits[1]){
                 //remove ecompared
                 const indexToDelete = orderedOperations.indexOf(eCompared)
@@ -1400,16 +1399,7 @@ const resistorBandCountColorsConfiguration = [
     {bandType: "tempCoeff", colors: ["brown", "red", "orange", "yellow", "blue", "violet"]},
 ]
 
-/*
-
-const resistorBandCountColorsConfiguration = [
-    {bandType: "digit", colors: ["black", "#663232", "#ff0000", "#ff6600", "#ffff00", "#33cd32", "#6666ff", "#cd66ff", "#939393", "white", "#cd9932", "#cccbcb"]},
-    {bandType: "multiplier", colors: ["black", "#663232", "#ff0000", "#ff6600", "#ffff00", "#33cd32", "#6666ff", "#cd66ff", "#939393", "white", "#cd9932", "#cccbcb"]},
-    {bandType: "tolerance", colors: ["#663232", "#ff0000", "#33cd32", "#6666ff", "#cd66ff", "#cd66ff", "#cd66ff", "#cd66ff"]},
-    {bandType: "tempCoeff", colors: ["#663232", "#ff0000", "#ff6600", "#ffff00", "#6666ff", "#cd66ff"]},
-]
-
-*/
+const resistorColorsData = {"black":"#000000", "brown":"#663232", "red":"#ff0000", "orange":"#ff6600", "yellow":"#ffff00", "green":"#33cd32", "blue":"#6666ff", "violet":"#cd66ff", "gray":"#939393", "white":"#ffffff", "gold":"#cd9932", "silver":"#cccbcb"}
 
 // add all resistors
 for (let i = 0; i < 6; i++) {
@@ -1417,9 +1407,6 @@ for (let i = 0; i < 6; i++) {
     `<div onmouseenter="ResistorBandStateChange(${i}, true)" onmouseleave="ResistorBandStateChange(${i}, false)" class="resistorBandClass">
     </div>`
 }  
-
-const RESCOLOR = {"black":"#000000", "brown":"#663232", "red":"#ff0000", "orange":"#ff6600", "yellow":"#ffff00", "green":"#33cd32", "blue":"#6666ff", "violet":"#cd66ff", "gray":"#939393", "white":"#ffffff", "gold":"#cd9932", "silver":"#cccbcb"}
-
 
 let bandCount = 0
 let resistorLatestEdit = "" // value, color
@@ -1440,7 +1427,7 @@ function ResistorBandCountChanger(value){
             for (let a = 0; a < colors.length; a++) {
                 const color = colors[a];
                 const styleAddition = color == "black" ? "color: rgb(200,200,200)" : ""
-                resitorBodyDivElement.children[i].innerHTML += `<button onclick="ResistorBandColorChosen(${i}, this.style.backgroundColor)" style="background-color: ${RESCOLOR[color]}; opacity: 0;${styleAddition}" class="resistorBandColorButtonClass">${color}</button>`
+                resitorBodyDivElement.children[i].innerHTML += `<button onclick="ResistorBandColorChosen(${i}, this.style.backgroundColor)" style="background-color: ${resistorColorsData[color]}; opacity: 0;${styleAddition}" class="resistorBandColorButtonClass">${color}</button>`
             }
         }
     }
@@ -1543,7 +1530,7 @@ function CalculateResistorFromColor() {
     for (let i = 0; i < bandCount; i++) {
         const child = resitorBodyDivElement.children[i];
         const c = child.style.backgroundColor == "" ? "rgb(0,0,0)" : child.style.backgroundColor
-        colors[i] = getKeyByValue(RESCOLOR,rgba2hex(c))
+        colors[i] = getKeyByValue(resistorColorsData,rgba2hex(c))
         colorValues[i] = resistorColorDigits.indexOf(colors[i])
         enteredIndexes.push(i)
     } 
@@ -1627,9 +1614,9 @@ function CalculateResistorFromValue(){
             resistorCalculatorResultResistance.style.color = "red"
             return
         }
-        ResistorBandColorUpdate(0, RESCOLOR[band1])
-        ResistorBandColorUpdate(1, RESCOLOR[band2])
-        ResistorBandColorUpdate(2, RESCOLOR[multiplierBand])
+        ResistorBandColorUpdate(0, resistorColorsData[band1])
+        ResistorBandColorUpdate(1, resistorColorsData[band2])
+        ResistorBandColorUpdate(2, resistorColorsData[multiplierBand])
         //only for band count 4
         if(bandCount == 4){
             for (let i = 0; i < Object.keys(resistorToleranceValues).length; i++) {
@@ -1645,7 +1632,7 @@ function CalculateResistorFromValue(){
                 resistorCalculatorResultTolerance.style.color = "red"
                 return
             }
-            ResistorBandColorUpdate(3, RESCOLOR[toleranceBand])
+            ResistorBandColorUpdate(3, resistorColorsData[toleranceBand])
         }
         
         
@@ -1700,11 +1687,11 @@ function CalculateResistorFromValue(){
             return
         }
         
-        ResistorBandColorUpdate(0, RESCOLOR[band1])
-        ResistorBandColorUpdate(1, RESCOLOR[band2])
-        ResistorBandColorUpdate(2, RESCOLOR[band3])
-        ResistorBandColorUpdate(3, RESCOLOR[multiplierBand])
-        ResistorBandColorUpdate(4, RESCOLOR[toleranceBand])
+        ResistorBandColorUpdate(0, resistorColorsData[band1])
+        ResistorBandColorUpdate(1, resistorColorsData[band2])
+        ResistorBandColorUpdate(2, resistorColorsData[band3])
+        ResistorBandColorUpdate(3, resistorColorsData[multiplierBand])
+        ResistorBandColorUpdate(4, resistorColorsData[toleranceBand])
 
         //only for band count 6
         if(bandCount == 6){
@@ -1721,7 +1708,7 @@ function CalculateResistorFromValue(){
                 resistorCalculatorResultTempCoeff.style.color = "red"
                 return
             }
-            ResistorBandColorUpdate(5,RESCOLOR[tempCoeffBand])
+            ResistorBandColorUpdate(5,resistorColorsData[tempCoeffBand])
         }
     }
 

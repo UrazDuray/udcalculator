@@ -1,5 +1,4 @@
 To do:
-- custom titlebar ~~
 - ctrl + z düzgün çalışmıyo kendi historyni yap
 - horizontal scroll düzelt
 - add currency conversion to main calculator
