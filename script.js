@@ -20,7 +20,8 @@ const operationsData = [
     {operation: "conversion", symbols: ["to"], category: "unitConversion", operationApplianceType: "numberOnLeft", examples: ["[#36c1f7]{x}[#ad6dfc]{U}to[#ad6dfc]{U}"], color: "#6dfc74", description: "Converts units", priority: 10, vectorCountNeededForOperation: [0]},
 
     //functions
-    {operation: "convertToVector", symbols: ["vec", "vector"], category: "function", examples: ["vec([#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>cross<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z})"], color: "#6dfc74", description: "Different way of declaring vector", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 3},
+    {operation: "convertToVector", symbols: ["vec", "vector"], category: "function", examples: ["vec([#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z})"], color: "#6dfc74", description: "Different way of declaring vector", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 3},
+    {operation: "sumOfRange", symbols: ["sum"], category: "function", examples: ["sum([#36c1f7]{x}, [#36c1f7]{y})"], color: "#6dfc74", description: "Sum between the range. Both ends are included", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 2},
 
     //vectors
     {operation: "crossProduct", symbols: ["crossp"], category: "vector", operationApplianceType: "twoNumbers", examples: ["<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>crossp<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Takes cross product of two vectors", priority: 9, vectorCountNeededForOperation: [2]},
@@ -211,7 +212,8 @@ function CalculatorOnInput(input, restoreCursorPlace){
         const nextElement = t_OOAN2[i+1]
         const prevElement = t_OOAN2[i-1]
         
-        if(!(i == 0 || (prevElement && (prevElement.operation || prevElement.argSplitter)))){ continue }
+        // If this condition is satisfied code will go in to switch
+        if(!(i == 0 || (prevElement && prevElement.operation != "factorial" && (prevElement.operation || prevElement.argSplitter)))){ continue }
         // Check operation specific properties
         switch (e.operation) {
             case "substract":{
@@ -495,6 +497,8 @@ function ApplyOperation(operation, nums, vectorMode){
         //functions
         case "convertToVector":
             return FunctionToVectorConversion(nums)
+        case "sumOfRange":
+            return SumOfRangeFunction(nums[0], nums[1])
         default:
             return undefined
     }
@@ -1464,6 +1468,14 @@ function ProjectVectorOnVector(v1, v2){
 //not! pek gerekli deil
 function FunctionToVectorConversion(nums){
     return nums
+}
+
+function SumFromZeroToN(n){
+    return (n * (n + 1)) / 2;
+}
+
+function SumOfRangeFunction(start, end){
+    return SumFromZeroToN(end) - SumFromZeroToN(start - 1);
 }
 
 //#endregion

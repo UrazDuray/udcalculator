@@ -9,7 +9,6 @@ To do:
 - add hsl to color picker
 - add favorite colors
 - random atar func
-- sayıdan sayıya toplayan func
 - sayıdan sayıya çarpan func
 
 functions:
@@ -20,3 +19,5 @@ functions:
 
 Added:
 - Added color picker
+- Added sum of numbers in range
+- Fixed a bug causing factorial - factorial to return an incorrect result
