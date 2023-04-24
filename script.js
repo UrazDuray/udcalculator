@@ -1400,6 +1400,16 @@ const resistorBandCountColorsConfiguration = [
     {bandType: "tempCoeff", colors: ["brown", "red", "orange", "yellow", "blue", "violet"]},
 ]
 
+/*
+
+const resistorBandCountColorsConfiguration = [
+    {bandType: "digit", colors: ["black", "#663232", "#ff0000", "#ff6600", "#ffff00", "#33cd32", "#6666ff", "#cd66ff", "#939393", "white", "#cd9932", "#cccbcb"]},
+    {bandType: "multiplier", colors: ["black", "#663232", "#ff0000", "#ff6600", "#ffff00", "#33cd32", "#6666ff", "#cd66ff", "#939393", "white", "#cd9932", "#cccbcb"]},
+    {bandType: "tolerance", colors: ["#663232", "#ff0000", "#33cd32", "#6666ff", "#cd66ff", "#cd66ff", "#cd66ff", "#cd66ff"]},
+    {bandType: "tempCoeff", colors: ["#663232", "#ff0000", "#ff6600", "#ffff00", "#6666ff", "#cd66ff"]},
+]
+
+*/
 
 // add all resistors
 for (let i = 0; i < 6; i++) {
@@ -1407,6 +1417,9 @@ for (let i = 0; i < 6; i++) {
     `<div onmouseenter="ResistorBandStateChange(${i}, true)" onmouseleave="ResistorBandStateChange(${i}, false)" class="resistorBandClass">
     </div>`
 }  
+
+const RESCOLOR = {"black":"#000000", "brown":"#663232", "red":"#ff0000", "orange":"#ff6600", "yellow":"#ffff00", "green":"#33cd32", "blue":"#6666ff", "violet":"#cd66ff", "gray":"#939393", "white":"#ffffff", "gold":"#cd9932", "silver":"#cccbcb"}
+
 
 let bandCount = 0
 let resistorLatestEdit = "" // value, color
@@ -1423,10 +1436,11 @@ function ResistorBandCountChanger(value){
             resitorBodyDivElement.children[i].style.display = "grid"
             const bandType = bandCountConfig[i];
             const colors = resistorBandCountColorsConfiguration.find(x => x.bandType == bandType).colors
+
             for (let a = 0; a < colors.length; a++) {
                 const color = colors[a];
                 const styleAddition = color == "black" ? "color: rgb(200,200,200)" : ""
-                resitorBodyDivElement.children[i].innerHTML += `<button onclick="ResistorBandColorChosen(${i}, this.style.backgroundColor)" style="background-color: ${color}; opacity: 0;${styleAddition}" class="resistorBandColorButtonClass">${color}</button>`
+                resitorBodyDivElement.children[i].innerHTML += `<button onclick="ResistorBandColorChosen(${i}, this.style.backgroundColor)" style="background-color: ${RESCOLOR[color]}; opacity: 0;${styleAddition}" class="resistorBandColorButtonClass">${color}</button>`
             }
         }
     }
@@ -1462,15 +1476,18 @@ function ResistorBandStateChange(resistorId, choosing){
     
 }
 
+const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`
+
 function ResistorBandColorChosen(resistorId, color){
     ResistorBandColorUpdate(resistorId, color)
     CalculateResistorFromColor()
 }
 
 function ResistorBandColorUpdate(resistorId, color){
+
     resitorBodyDivElement.children[resistorId].style.backgroundColor = color
     StopResistorBandChoosing(resistorId)
-}
+}   
 
 function StopResistorBandChoosing(resistorId){
     for (let i = 0; i < resitorBodyDivElement.children[resistorId].children.length; i++) {
@@ -1514,6 +1531,9 @@ const resistorCalculatorResultResistance = document.getElementById("resistorCalc
 const resistorCalculatorResultTolerance = document.getElementById("resistorCalculatorResultTolerance")
 const resistorCalculatorResultTempCoeff = document.getElementById("resistorCalculatorResultTempCoeff")
 
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+  }
 
 function CalculateResistorFromColor() {
     let colors = [0, 0, 0, 0, 0, 0]
@@ -1522,10 +1542,12 @@ function CalculateResistorFromColor() {
     let enteredIndexes = []
     for (let i = 0; i < bandCount; i++) {
         const child = resitorBodyDivElement.children[i];
-        colors[i] = child.style.backgroundColor
+        const c = child.style.backgroundColor == "" ? "rgb(0,0,0)" : child.style.backgroundColor
+        colors[i] = getKeyByValue(RESCOLOR,rgba2hex(c))
         colorValues[i] = resistorColorDigits.indexOf(colors[i])
         enteredIndexes.push(i)
     } 
+
     
     let digit1, digit2, digit3, multiplier, tolerance, tempCoeff
     if(bandCount == 3){
@@ -1600,13 +1622,14 @@ function CalculateResistorFromValue(){
                 }
             }
         }
+
         if(band1 == undefined || band2 == undefined || multiplierBand == undefined){
             resistorCalculatorResultResistance.style.color = "red"
             return
         }
-        ResistorBandColorUpdate(0, band1)
-        ResistorBandColorUpdate(1, band2)
-        ResistorBandColorUpdate(2, multiplierBand)
+        ResistorBandColorUpdate(0, RESCOLOR[band1])
+        ResistorBandColorUpdate(1, RESCOLOR[band2])
+        ResistorBandColorUpdate(2, RESCOLOR[multiplierBand])
         //only for band count 4
         if(bandCount == 4){
             for (let i = 0; i < Object.keys(resistorToleranceValues).length; i++) {
@@ -1622,7 +1645,7 @@ function CalculateResistorFromValue(){
                 resistorCalculatorResultTolerance.style.color = "red"
                 return
             }
-            ResistorBandColorUpdate(3, toleranceBand)
+            ResistorBandColorUpdate(3, RESCOLOR[toleranceBand])
         }
         
         
@@ -1677,11 +1700,11 @@ function CalculateResistorFromValue(){
             return
         }
         
-        ResistorBandColorUpdate(0, band1)
-        ResistorBandColorUpdate(1, band2)
-        ResistorBandColorUpdate(2, band3)
-        ResistorBandColorUpdate(3, multiplierBand)
-        ResistorBandColorUpdate(4, toleranceBand)
+        ResistorBandColorUpdate(0, RESCOLOR[band1])
+        ResistorBandColorUpdate(1, RESCOLOR[band2])
+        ResistorBandColorUpdate(2, RESCOLOR[band3])
+        ResistorBandColorUpdate(3, RESCOLOR[multiplierBand])
+        ResistorBandColorUpdate(4, RESCOLOR[toleranceBand])
 
         //only for band count 6
         if(bandCount == 6){
@@ -1698,7 +1721,7 @@ function CalculateResistorFromValue(){
                 resistorCalculatorResultTempCoeff.style.color = "red"
                 return
             }
-            ResistorBandColorUpdate(5, tempCoeffBand)
+            ResistorBandColorUpdate(5,RESCOLOR[tempCoeffBand])
         }
     }
 
