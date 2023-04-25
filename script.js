@@ -10,6 +10,11 @@ const placeHolderChar = "~" // used as a placeholder in code it cant be used
 const CalculatorInputDivElement = document.getElementById("CalculatorInputDiv")
 const argSplitter = ','
 
+// Debug
+const debugMode = true
+const debugTurnOffCurrencyApi = true
+//CalculatorInputDivElement.textContent = "<1,-2,3>crossp<1,5,7>"
+
 const operationsData = [
     {operation: "primeCheck", symbols: ["prime"], category: "primeCheck", operationApplianceType: "numberOnRight", examples: ["prime[#36c1f7]{x}"], color: "#6dfc74", description: "Checks if the number is prime. If it is it returns 1 if not 0", priority: 10, vectorCountNeededForOperation: [0]},
     // convert radians to d
@@ -130,12 +135,9 @@ CalculatorInputDivElement.addEventListener('wheel', e => {
     CalculatorInputDivElement.scrollLeft += e.deltaY/3;
 })
 
-//test
-//CalculatorInputDivElement.textContent = "<1,-2,3>crossp<1,5,7>"
-
 function CalculatorOnInput(input, restoreCursorPlace){
     // Measure calculation speed
-    const startDate = new Date()
+    //const startDate = new Date()
 
     lastCalculatorInput = input
     incorrectInput = false
@@ -250,6 +252,7 @@ function CalculatorOnInput(input, restoreCursorPlace){
     
     // Measure calculation speed
     //console.log(`Calculated in ${new Date() - startDate}ms`)
+    return result
 }
 
 function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
@@ -1126,7 +1129,15 @@ var saveSelection, restoreSelection;
 
 if (window.getSelection && document.createRange) {
     saveSelection = function(containerEl) {
-        var range = window.getSelection().getRangeAt(0);
+        try {
+            var range = window.getSelection().getRangeAt(0);
+        }catch (error){
+            if(error.toString() == "IndexSizeError: Failed to execute 'getRangeAt' on 'Selection': 0 is not a valid index."){
+                return
+            }
+            console.error(error)
+        }
+
         var preSelectionRange = range.cloneRange();
         preSelectionRange.selectNodeContents(containerEl);
         preSelectionRange.setEnd(range.startContainer, range.startOffset);
@@ -1192,7 +1203,7 @@ if (window.getSelection && document.createRange) {
     };
 }
 
-var savedSelection;
+var savedSelection = {start: 0, end: 0};
 
 function SaveCursorPlace() {
     savedSelection = saveSelection( document.getElementById("CalculatorInputDiv") );
@@ -1842,7 +1853,6 @@ function CompactNumberToInteger(compactString) {
 //#endregion
 
 //#region Currency conversion
-const debugTurnOffCurrencyApi = true
 const currencyApiLink = "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur.json"
 let currencyValueData = {}
 

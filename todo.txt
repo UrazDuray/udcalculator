@@ -8,7 +8,6 @@ To do:
 - calculation inside variable value
 - add hsl to color picker
 - add favorite colors
-- sayıdan sayıya çarpan func
 
 
 functions:
