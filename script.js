@@ -61,6 +61,7 @@ const operationsData = [
     {operation: "ln", symbols: ["ln"], operationApplianceType: "numberOnRight", examples: ["ln[#f73636]{y}"], color: "#6dfc74", description: "Log with base as e", priority: 5, vectorCountNeededForOperation: [0]},
     {operation: "power", symbols: ["^"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}^[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 4, vectorCountNeededForOperation: [0]},
     {operation: "root", symbols: ["r", "ro", "root"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}root[#f73636]{y}", "[#36c1f7]{x}r[#f73636]{y}", "r[#f73636]{y}"], color: "#6dfc74", description: "x is index of root. If there is no x it will be assumed as 2", priority: 3, vectorCountNeededForOperation: [0]},
+    {operation: "percentage", symbols: ["%"], operationApplianceType: "numberOnLeft", examples: ["[#36c1f7]{x}%"], color: "#36c1f7", description: "divides number by 100", priority: 2, vectorCountNeededForOperation: [0]},
     {operation: "multiply", symbols: ["*"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}*[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 2, vectorCountNeededForOperation: [0, 1]},
     {operation: "divide", symbols: ["/"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}/[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 2, vectorCountNeededForOperation: [0, 1]},
     {operation: "substract", symbols: ["-"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}-[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 1, vectorCountNeededForOperation: [0, 2]},
@@ -436,6 +437,8 @@ function ApplyOperation(operation, nums, vectorMode){
             return DivideOperation(nums[0], nums[1], vectorMode)
         case "multiply":
             return MultiplyOperation(nums[0], nums[1], vectorMode)
+        case "percentage":
+            return nums[0] / 100
         case "power":
             return nums[0]**nums[1]
         case "root":

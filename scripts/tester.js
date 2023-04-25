@@ -12,6 +12,7 @@ const testList = [
     {functionName: "CalculatorOnInput", args: ["lne", false], expectedOutput: 1},
     {functionName: "CalculatorOnInput", args: ["deg(2*pi)", false], expectedOutput: 360},
     {functionName: "CalculatorOnInput", args: ["lne", false], expectedOutput: 1},
+    {functionName: "CalculatorOnInput", args: ["10%", false], expectedOutput: 0.1},
     {functionName: "CalculatorOnInput", args: ["vec(1,2,3)", false], expectedOutput: "<1, 2, 3>"},
     {functionName: "CalculatorOnInput", args: ["vec(1,2,3)", false], expectedOutput: "<1, 2, 3>"},
 ]
