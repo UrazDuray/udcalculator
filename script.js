@@ -11,8 +11,8 @@ const CalculatorInputDivElement = document.getElementById("CalculatorInputDiv")
 const argSplitter = ','
 
 // Debug
-const debugMode = false
-const debugTurnOffCurrencyApi = false
+const debugMode = true
+const debugTurnOffCurrencyApi = true
 //CalculatorInputDivElement.textContent = "<1,-2,3>crossp<1,5,7>"
 
 const operationsData = [
