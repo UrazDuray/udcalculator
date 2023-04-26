@@ -29,8 +29,6 @@ const createWindow = () => {
     shell.openExternal('https://github.com/UrazDuray/udcalculator/releases/tag/1.1.0')
   })
 
-
-
   win.setAlwaysOnTop(false);
 
   win.loadFile('index.html');

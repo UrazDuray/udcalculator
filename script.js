@@ -8,6 +8,12 @@ let lastCalculatorInput = ""
 const placeHolderChar = "~" // used as a placeholder in code it cant be used
 
 const CalculatorInputDivElement = document.getElementById("CalculatorInputDiv")
+const argSplitter = ','
+
+// Debug
+const debugMode = true
+const debugTurnOffCurrencyApi = true
+//CalculatorInputDivElement.textContent = "<1,-2,3>crossp<1,5,7>"
 
 const operationsData = [
     {operation: "primeCheck", symbols: ["prime"], category: "primeCheck", operationApplianceType: "numberOnRight", examples: ["prime[#36c1f7]{x}"], color: "#6dfc74", description: "Checks if the number is prime. If it is it returns 1 if not 0", priority: 10, vectorCountNeededForOperation: [0]},
@@ -19,10 +25,12 @@ const operationsData = [
     {operation: "conversion", symbols: ["to"], category: "unitConversion", operationApplianceType: "numberOnLeft", examples: ["[#36c1f7]{x}[#ad6dfc]{U}to[#ad6dfc]{U}"], color: "#6dfc74", description: "Converts units", priority: 10, vectorCountNeededForOperation: [0]},
 
     //functions
-    //{operation: "convertToVector", symbols: ["vec", "vector"], category: "function", examples: ["vec([#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>cross<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z})"], color: "#6dfc74", description: "Different way of declaring vector", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 3},
+    {operation: "convertToVector", symbols: ["vec", "vector"], category: "function", examples: ["vec([#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z})"], color: "#6dfc74", description: "Different way of declaring vector", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 3},
+    {operation: "sumOfRange", symbols: ["sum"], category: "function", examples: ["sum([#36c1f7]{x}, [#36c1f7]{y})"], color: "#6dfc74", description: "Sum between the range. Both ends are included", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 2},
+    {operation: "randomOfRange", symbols: ["rand", "random"], category: "function", examples: ["rand([#36c1f7]{x}, [#36c1f7]{y})"], color: "#6dfc74", description: "Returns an integer between the range. Both ends are included.", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 2},
 
     //vectors
-    {operation: "crossProduct", symbols: ["crossp"], category: "vector", operationApplianceType: "twoNumbers", examples: ["<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>cross<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Takes cross product of two vectors", priority: 9, vectorCountNeededForOperation: [2]},
+    {operation: "crossProduct", symbols: ["crossp"], category: "vector", operationApplianceType: "twoNumbers", examples: ["<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>crossp<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Takes cross product of two vectors", priority: 9, vectorCountNeededForOperation: [2]},
     {operation: "dotProduct", symbols: ["dotp"], category: "vector", operationApplianceType: "twoNumbers", examples: ["<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>dotp<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Takes dot product of two vectors", priority: 9, vectorCountNeededForOperation: [2]},
     {operation: "magnitudeOfVector", symbols: ["mag", "magnitude"], category: "vector", operationApplianceType: "numberOnRight", examples: ["mag<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Calculates the length of the vector", priority: 9, vectorCountNeededForOperation: [1]},
     {operation: "unitVectorOfVector", symbols: ["unit"], category: "vector", operationApplianceType: "numberOnRight", examples: ["unit<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Calculates the unit vector of the vector", priority: 9, vectorCountNeededForOperation: [1]},
@@ -53,6 +61,7 @@ const operationsData = [
     {operation: "ln", symbols: ["ln"], operationApplianceType: "numberOnRight", examples: ["ln[#f73636]{y}"], color: "#6dfc74", description: "Log with base as e", priority: 5, vectorCountNeededForOperation: [0]},
     {operation: "power", symbols: ["^"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}^[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 4, vectorCountNeededForOperation: [0]},
     {operation: "root", symbols: ["r", "ro", "root"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}root[#f73636]{y}", "[#36c1f7]{x}r[#f73636]{y}", "r[#f73636]{y}"], color: "#6dfc74", description: "x is index of root. If there is no x it will be assumed as 2", priority: 3, vectorCountNeededForOperation: [0]},
+    {operation: "percentage", symbols: ["%"], operationApplianceType: "numberOnLeft", examples: ["[#36c1f7]{x}%"], color: "#36c1f7", description: "divides number by 100", priority: 2, vectorCountNeededForOperation: [0]},
     {operation: "multiply", symbols: ["*"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}*[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 2, vectorCountNeededForOperation: [0, 1]},
     {operation: "divide", symbols: ["/"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}/[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 2, vectorCountNeededForOperation: [0, 1]},
     {operation: "substract", symbols: ["-"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}-[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 1, vectorCountNeededForOperation: [0, 2]},
@@ -65,7 +74,7 @@ const specialNumbersData = [
     {specialNumber: "infinity", equivalentNumber: (1/0), symbols: ["inf", "infinity", "∞"], examples: ["[#ad6dfc]{inf}", "[#ad6dfc]{infinity}", "[#ad6dfc]{∞}"], color: "#ad6dfc", description: "Infinity"}
 ]
 
-//4 significant figures for weird numbers in equivalentValue
+// 4 significant figures for weird numbers in equivalentValue
 const unitsData = [
     {unit: "celcius", symbols: ["c", "C"], category: "temperature", color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{c}[#6dfc74]{to}[#dec64e]{k}"], description: "-"},
     {unit: "fahrenheit", symbols: ["f", "F"], category: "temperature", color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{f}[#6dfc74]{to}[#dec64e]{k}"], description: "-"},
@@ -127,12 +136,9 @@ CalculatorInputDivElement.addEventListener('wheel', e => {
     CalculatorInputDivElement.scrollLeft += e.deltaY/3;
 })
 
-//test
-//CalculatorInputDivElement.textContent = "<1,-2,3>crossp<1,5,7>"
-
 function CalculatorOnInput(input, restoreCursorPlace){
     // Measure calculation speed
-    const startDate = new Date()
+    //const startDate = new Date()
 
     lastCalculatorInput = input
     incorrectInput = false
@@ -145,6 +151,8 @@ function CalculatorOnInput(input, restoreCursorPlace){
     
     //find vectors
     let vectorsOrdered = FindVectors(input)
+
+    //input = EditInputForFunctions(input)
     
     // Find orderedOperations
     orderedByParantheseArray.forEach(e => {
@@ -178,6 +186,16 @@ function CalculatorOnInput(input, restoreCursorPlace){
     // Find numbers
     let numbersOrdered = FindNumbers(input, [...orderedOperations]).concat(vectorsOrdered)
     let orderedOperationsAndNumbers = orderedOperations.concat(numbersOrdered)
+
+    //find arg splitters
+    for (let i = 1; i < input.length; i++) {
+        const char = input[i];
+        if(char == argSplitter){
+            orderedOperationsAndNumbers.push({argSplitter: true, index: i-1})
+        }
+    }
+
+    //sort it by index ascending order
     orderedOperationsAndNumbers = orderedOperationsAndNumbers.sort(({index:a}, {index:b}) => a-b)
     
     //remove custom variables from ordered operations
@@ -198,7 +216,8 @@ function CalculatorOnInput(input, restoreCursorPlace){
         const nextElement = t_OOAN2[i+1]
         const prevElement = t_OOAN2[i-1]
         
-        if(!(i == 0 || (prevElement && prevElement.operation))){ continue }
+        // If this condition is satisfied code will go in to switch
+        if(!(i == 0 || (prevElement && prevElement.operation != "factorial" && prevElement.operation != "percentage" && (prevElement.operation || prevElement.argSplitter)))){ continue }
         // Check operation specific properties
         switch (e.operation) {
             case "substract":{
@@ -234,12 +253,14 @@ function CalculatorOnInput(input, restoreCursorPlace){
     
     // Measure calculation speed
     //console.log(`Calculated in ${new Date() - startDate}ms`)
+    return result
 }
 
 function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
     input = input.substring(1, input.length-1) //remove ghost parantheses
     unitsToColorize = []
     let resultToReturn
+    
     for (let i = 0; i < orderedOperations.length; i++) {
         const e = orderedOperations[i]
         
@@ -250,7 +271,27 @@ function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
         let currentOperationData = operationsData.find(x => x.operation == currentOperation.operation)
         let currentOperationApplianceType = currentOperationData.operationApplianceType
     
-        if(currentOperationApplianceType == "twoNumbers" && !currentOperation.passThisOperation){
+        if(currentOperationData.category == "function"){
+            let numsArray = []
+            let argCounter = 1
+            let argIterator = 1
+            while(argCounter <= currentOperationData.argumentCount){
+                const num = orderedOperationsAndNumbers[currentOperationIndex + argIterator];
+                if(num == undefined){ ThrowErrorCode("Incorrect use of function"); return }
+                argIterator++
+                if(num.argSplitter) continue
+                numsArray.push(num.number)
+                argCounter++
+            }
+        
+            const result = ApplyOperation(currentOperation, numsArray, false)
+            let objectToAdd = {number: result, index: currentOperationIndex}
+            if(typeof result == "object") objectToAdd.vector = true
+            orderedOperationsAndNumbers.splice(currentOperationIndex, numsArray.length*2, objectToAdd) // numsArray.length*2 -1 + 1 -> arglar + splitter + 1(for ghost paranthese)
+            
+            resultToReturn = result
+        }
+        else if(currentOperationApplianceType == "twoNumbers" && !currentOperation.passThisOperation){
             const num1Element = orderedOperationsAndNumbers[currentOperationIndex - 1]
             let num2Element = orderedOperationsAndNumbers[currentOperationIndex + 1]
             if(num2Element == undefined){ ThrowErrorCode("Missing number"); return }
@@ -396,6 +437,8 @@ function ApplyOperation(operation, nums, vectorMode){
             return DivideOperation(nums[0], nums[1], vectorMode)
         case "multiply":
             return MultiplyOperation(nums[0], nums[1], vectorMode)
+        case "percentage":
+            return nums[0] / 100
         case "power":
             return nums[0]**nums[1]
         case "root":
@@ -461,6 +504,10 @@ function ApplyOperation(operation, nums, vectorMode){
         //functions
         case "convertToVector":
             return FunctionToVectorConversion(nums)
+        case "sumOfRange":
+            return SumOfRangeFunction(nums[0], nums[1])
+        case "randomOfRange":
+            return RandomOfRangeFunction(nums[0], nums[1])
         default:
             return undefined
     }
@@ -588,7 +635,6 @@ function FindOperations(input, indexShift){
             const eComparedLimits = [eCompared.index, eCompared.index + eCompared.symbol.length]
             if(e == eCompared || operationsToBeDeleted.includes(eCompared)){ continue }
 
-            console.log(eLimits, eComparedLimits)
             if(eLimits[0] <= eComparedLimits[0] && eComparedLimits[1] <= eLimits[1]){
                 //remove ecompared
                 const indexToDelete = orderedOperations.indexOf(eCompared)
@@ -660,6 +706,56 @@ function FindVectors(input){
     }
     return vectorsOrdered
 }
+
+let functionsData = []
+operationsData.forEach( e => {
+    if(e.category == "function"){
+        functionsData.push(e)
+    }
+})
+
+// function EditInputForFunctions(input){
+//     let functionsFound = []
+//     functionsData.forEach(e => {
+//         let temporaryInput = input
+//         while (true) {
+//             symbolData = CheckIfStringIncludesStringsInArray(temporaryInput, e.symbols)
+//             if(symbolData == false){ break }
+//             let index = symbolData[0]
+//             let symbolString = symbolData[1]
+
+//             functionsFound.push({operation: e.operation, index: index - 1, symbol: symbolString, priority: e.priority}) //index + indexShift - 1: 1-> baştaki parantez için
+//             let symbolLength = symbolString.length
+//             temporaryInput = ReplaceWithPlaceHoldersAtIndex(temporaryInput, index, placeHolderChar, symbolLength)
+//         }
+//     });
+
+//     //find args of function
+//     let indexShift = 0
+//     for (let i = 0; i < functionsFound.length; i++) {
+//         const func = functionsFound[i];
+
+//         //find paranthese indexes
+//         const parantheseStartIndex = func.index + func.symbol.length + 1 + indexShift // +1 for the ghost paranthese at start
+//         if(input[parantheseStartIndex] != '('){ ThrowErrorCode("Incorrect use of function"); return }
+//         let parantheseEndIndex
+//         for (let a = parantheseStartIndex + 1; a < input.length; a++) {
+//             const char = input[a];
+//             if(char == ")"){
+//                 parantheseEndIndex = a
+//                 break
+//             }
+//         }
+//         if(parantheseEndIndex == undefined){ ThrowErrorCode("Incorrect use of function"); return }
+
+//         let oldArgsString = input.substring(parantheseStartIndex, parantheseEndIndex)
+//         let argsString = '(' + oldArgsString.replaceAll(',', '),(') + ')'
+//         input = input.substring(0, parantheseStartIndex) + argsString + input.substring(parantheseEndIndex)
+//         indexShift += argsString.length - oldArgsString.length
+//     }
+
+//     return input
+// }
 
 function ReplaceWithPlaceHoldersAtIndex(text, index, placeHolderChar, count){
     return text.substring(0, index) + placeHolderChar.repeat(count) + text.substring(index + count)
@@ -938,6 +1034,7 @@ function AdditionalMenuToggle(open, index){
     
 }
 
+
 //#region Help Menu
 const helpButton = document.getElementById("helpButton")
 const helpMenu = document.getElementById("helpMenu")
@@ -1035,7 +1132,15 @@ var saveSelection, restoreSelection;
 
 if (window.getSelection && document.createRange) {
     saveSelection = function(containerEl) {
-        var range = window.getSelection().getRangeAt(0);
+        try {
+            var range = window.getSelection().getRangeAt(0);
+        }catch (error){
+            if(error.toString() == "IndexSizeError: Failed to execute 'getRangeAt' on 'Selection': 0 is not a valid index."){
+                return
+            }
+            console.error(error)
+        }
+
         var preSelectionRange = range.cloneRange();
         preSelectionRange.selectNodeContents(containerEl);
         preSelectionRange.setEnd(range.startContainer, range.startOffset);
@@ -1101,7 +1206,7 @@ if (window.getSelection && document.createRange) {
     };
 }
 
-var savedSelection;
+var savedSelection = {start: 0, end: 0};
 
 function SaveCursorPlace() {
     savedSelection = saveSelection( document.getElementById("CalculatorInputDiv") );
@@ -1382,10 +1487,22 @@ function FunctionToVectorConversion(nums){
     return nums
 }
 
+function SumFromZeroToN(n){
+    return (n * (n + 1)) / 2;
+}
+
+function SumOfRangeFunction(start, end){
+    return SumFromZeroToN(end) - SumFromZeroToN(start - 1);
+}
+
+function RandomOfRangeFunction(min, max){
+    return Math.round(Math.random() * (max - min) + min)
+}
+
 //#endregion
 
 //#region Resistor calculation
-const resitorBodyDivElement = document.getElementById("resitorBodyDiv")
+const resistorBodyDivElement = document.getElementById("resistorBodyDiv")
 
 const resistorBandCountConfiguration = [
     {bandCount: 3, configuration: ["digit", "digit", "multiplier"]},
@@ -1400,10 +1517,11 @@ const resistorBandCountColorsConfiguration = [
     {bandType: "tempCoeff", colors: ["brown", "red", "orange", "yellow", "blue", "violet"]},
 ]
 
+const resistorColorsData = {"black":"#000000", "brown":"#663232", "red":"#ff0000", "orange":"#ff6600", "yellow":"#ffff00", "green":"#33cd32", "blue":"#6666ff", "violet":"#cd66ff", "gray":"#939393", "white":"#ffffff", "gold":"#cd9932", "silver":"#cccbcb"}
 
 // add all resistors
 for (let i = 0; i < 6; i++) {
-    resitorBodyDivElement.innerHTML += 
+    resistorBodyDivElement.innerHTML += 
     `<div onmouseenter="ResistorBandStateChange(${i}, true)" onmouseleave="ResistorBandStateChange(${i}, false)" class="resistorBandClass">
     </div>`
 }  
@@ -1415,18 +1533,19 @@ function ResistorBandCountChanger(value){
     const bandCountConfig = resistorBandCountConfiguration.find(x => x.bandCount == value).configuration
 
     for (let i = 0; i < 6; i++) {
-        resitorBodyDivElement.children[i].innerHTML = ""
+        resistorBodyDivElement.children[i].innerHTML = ""
         if(i >= value){
-            resitorBodyDivElement.children[i].style.display = "none"
+            resistorBodyDivElement.children[i].style.display = "none"
         }
         else{
-            resitorBodyDivElement.children[i].style.display = "grid"
+            resistorBodyDivElement.children[i].style.display = "grid"
             const bandType = bandCountConfig[i];
             const colors = resistorBandCountColorsConfiguration.find(x => x.bandType == bandType).colors
+
             for (let a = 0; a < colors.length; a++) {
                 const color = colors[a];
                 const styleAddition = color == "black" ? "color: rgb(200,200,200)" : ""
-                resitorBodyDivElement.children[i].innerHTML += `<button onclick="ResistorBandColorChosen(${i}, this.style.backgroundColor)" style="background-color: ${color}; opacity: 0;${styleAddition}" class="resistorBandColorButtonClass">${color}</button>`
+                resistorBodyDivElement.children[i].innerHTML += `<button onclick="ResistorBandColorChosen(${i}, this.style.backgroundColor)" style="background-color: ${resistorColorsData[color]}; opacity: 0;${styleAddition}" class="resistorBandColorButtonClass">${color}</button>`
             }
         }
     }
@@ -1468,19 +1587,20 @@ function ResistorBandColorChosen(resistorId, color){
 }
 
 function ResistorBandColorUpdate(resistorId, color){
-    resitorBodyDivElement.children[resistorId].style.backgroundColor = color
+
+    resistorBodyDivElement.children[resistorId].style.backgroundColor = color
     StopResistorBandChoosing(resistorId)
-}
+}   
 
 function StopResistorBandChoosing(resistorId){
-    for (let i = 0; i < resitorBodyDivElement.children[resistorId].children.length; i++) {
-        const child = resitorBodyDivElement.children[resistorId].children[i];
+    for (let i = 0; i < resistorBodyDivElement.children[resistorId].children.length; i++) {
+        const child = resistorBodyDivElement.children[resistorId].children[i];
         child.style.opacity = "0"
     } 
 }
 function StartResistorBandChoosing(resistorId){
-    for (let i = 0; i < resitorBodyDivElement.children[resistorId].children.length; i++) {
-        const child = resitorBodyDivElement.children[resistorId].children[i];
+    for (let i = 0; i < resistorBodyDivElement.children[resistorId].children.length; i++) {
+        const child = resistorBodyDivElement.children[resistorId].children[i];
         child.style.opacity = "1"
     } 
 }
@@ -1514,6 +1634,9 @@ const resistorCalculatorResultResistance = document.getElementById("resistorCalc
 const resistorCalculatorResultTolerance = document.getElementById("resistorCalculatorResultTolerance")
 const resistorCalculatorResultTempCoeff = document.getElementById("resistorCalculatorResultTempCoeff")
 
+function getKeyByValue(object, value) {
+    return Object.keys(object).find(key => object[key] === value);
+  }
 
 function CalculateResistorFromColor() {
     let colors = [0, 0, 0, 0, 0, 0]
@@ -1521,11 +1644,13 @@ function CalculateResistorFromColor() {
 
     let enteredIndexes = []
     for (let i = 0; i < bandCount; i++) {
-        const child = resitorBodyDivElement.children[i];
-        colors[i] = child.style.backgroundColor
+        const child = resistorBodyDivElement.children[i];
+        const c = child.style.backgroundColor == "" ? "rgb(0,0,0)" : child.style.backgroundColor
+        colors[i] = getKeyByValue(resistorColorsData,rgba2hex(c))
         colorValues[i] = resistorColorDigits.indexOf(colors[i])
         enteredIndexes.push(i)
     } 
+
     
     let digit1, digit2, digit3, multiplier, tolerance, tempCoeff
     if(bandCount == 3){
@@ -1600,13 +1725,14 @@ function CalculateResistorFromValue(){
                 }
             }
         }
+
         if(band1 == undefined || band2 == undefined || multiplierBand == undefined){
             resistorCalculatorResultResistance.style.color = "red"
             return
         }
-        ResistorBandColorUpdate(0, band1)
-        ResistorBandColorUpdate(1, band2)
-        ResistorBandColorUpdate(2, multiplierBand)
+        ResistorBandColorUpdate(0, resistorColorsData[band1])
+        ResistorBandColorUpdate(1, resistorColorsData[band2])
+        ResistorBandColorUpdate(2, resistorColorsData[multiplierBand])
         //only for band count 4
         if(bandCount == 4){
             for (let i = 0; i < Object.keys(resistorToleranceValues).length; i++) {
@@ -1622,7 +1748,7 @@ function CalculateResistorFromValue(){
                 resistorCalculatorResultTolerance.style.color = "red"
                 return
             }
-            ResistorBandColorUpdate(3, toleranceBand)
+            ResistorBandColorUpdate(3, resistorColorsData[toleranceBand])
         }
         
         
@@ -1677,11 +1803,11 @@ function CalculateResistorFromValue(){
             return
         }
         
-        ResistorBandColorUpdate(0, band1)
-        ResistorBandColorUpdate(1, band2)
-        ResistorBandColorUpdate(2, band3)
-        ResistorBandColorUpdate(3, multiplierBand)
-        ResistorBandColorUpdate(4, toleranceBand)
+        ResistorBandColorUpdate(0, resistorColorsData[band1])
+        ResistorBandColorUpdate(1, resistorColorsData[band2])
+        ResistorBandColorUpdate(2, resistorColorsData[band3])
+        ResistorBandColorUpdate(3, resistorColorsData[multiplierBand])
+        ResistorBandColorUpdate(4, resistorColorsData[toleranceBand])
 
         //only for band count 6
         if(bandCount == 6){
@@ -1698,7 +1824,7 @@ function CalculateResistorFromValue(){
                 resistorCalculatorResultTempCoeff.style.color = "red"
                 return
             }
-            ResistorBandColorUpdate(5, tempCoeffBand)
+            ResistorBandColorUpdate(5,resistorColorsData[tempCoeffBand])
         }
     }
 
@@ -1715,21 +1841,21 @@ const CompactNumberEquivalentValues = {
 function CompactNumberToInteger(compactString) {
     if(compactString.length < 1){ return}
     
-    const number = parseInt(compactString.slice(0, -1));
-    const unit = compactString.slice(-1);
+    const number = parseFloat(compactString.slice(0, -1));
+    const unit = compactString.slice(-1).toUpperCase();
     
-    if (CompactNumberEquivalentValues.hasOwnProperty(unit.toUpperCase())) {
+    if (CompactNumberEquivalentValues.hasOwnProperty(unit)) {
+
         return number * CompactNumberEquivalentValues[unit]
     } 
     else {
-        return parseInt(compactString)
+        return parseFloat(compactString)
     }
 }
 
 //#endregion
 
 //#region Currency conversion
-const debugTurnOffCurrencyApi = false
 const currencyApiLink = "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur.json"
 let currencyValueData = {}
 
@@ -1842,6 +1968,50 @@ function StopQueuedNotifications(){
 }
 //#endregion
 
-//#region History
+//#region Saved History
+function GetSavedHistory(){
+    if(sessionStorage.getItem("operationHistory")!==null){
+        return JSON.parse(sessionStorage.getItem("operationHistory"))
+    }else{
+        sessionStorage.setItem("operationHistory",JSON.stringify([]))
+        return JSON.parse(sessionStorage.getItem("operationHistory"))
+    }
+}
+
+function AddToSavedHistory(operation,result){
+    var operationHistory = GetSavedHistory()
+    operationHistory.push([operation,result])
+    sessionStorage.setItem("operationHistory", JSON.stringify(operationHistory))
+}
+
+function RemoveFromSavedHistory(operation){
+
+    var operationHistory = GetSavedHistory()
+    var tempOperationHistory=operationHistory.map(e=>e[0])
+
+    if(typeof operation === "integer"){                 //indexle silmek istersen
+        if(operationHistory.length>operation){
+            operationHistory.splice(operation,1)
+        }else{
+            console.log("index historyde yok")
+        }
+    }
+    else if(typeof operation === "string"){             //operasyonun kendisiyle silmek istersen
+        if(tempOperationHistory.indexOf(operation)!=-1){
+            operationHistory.splice(tempOperationHistory.indexOf(operation),1)
+        }else{
+            console.log("operasyon historyde yok")
+        }
+    }
+    sessionStorage.setItem("operationHistory", JSON.stringify(operationHistory))
+}
+
+document.addEventListener("keydown",(e)=>{   
+    if(e.key=="s" && e.ctrlKey && CalculatorInputDivElement.matches(':focus')){   //ikinci kondisyon input fokuslumu die bakıo
+        AddToSavedHistory(CalculatorInputDivElement.innerHTML,resultSpanElement.innerHTML)
+        console.log(GetSavedHistory())
+    }
+})
+
 //#endregion
 

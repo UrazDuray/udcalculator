@@ -1,5 +1,4 @@
 To do:
-- custom titlebar ~~
 - ctrl + z düzgün çalışmıyo kendi historyni yap
 - horizontal scroll düzelt
 - add currency conversion to main calculator
@@ -7,24 +6,17 @@ To do:
 - notification sağ alttan gelsin
 - notification yandan gözüküyor bug düzelt
 - calculation inside variable value
-- color picker
+- add hsl to color picker
+- add favorite colors
+
 
 functions:
-- vec()
 - vecrossp problemi
-- vec() içi eksi algılamıyo
-
 
 Added:
-- Add degree to radian conversion
-- Mile unit
-- Added vectors and vector operations
-- vector sum
-- boş variable bug
-- currency conversion
-- negatif sayılar hala sıkıntılı
-- update ui
-- always on top modu
-- version
-- resistor calculator
-- settings
+- Added color picker
+- Added sum of numbers in range
+- Fixed a bug causing factorial - factorial to return an incorrect result
+- Added functions
+- Added vec(x,y,z) different way of declaring vector
+- Added rand(x, y) random between range
