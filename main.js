@@ -34,8 +34,10 @@ const createWindow = () => {
   win.setAlwaysOnTop(false);
 
   win.loadFile('index.html');
+  
   //toolbarı kapa
   win.removeMenu()
+  
   // DevTools'u aç.
   win.webContents.openDevTools()
 };
