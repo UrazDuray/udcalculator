@@ -35,6 +35,9 @@ function TestAll(){
             failedTests.push(test)
         }
     }
+    CalculatorInputDivElement.textContent = ""
+    resultSpanElement.textContent = ""
+
     console.log("Failed tests: ", failedTests)
     console.log(`%cTest ended in ${new Date() - startDate}ms`, "color: #ed8808;")
 }
