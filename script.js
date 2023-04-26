@@ -217,7 +217,7 @@ function CalculatorOnInput(input, restoreCursorPlace){
         const prevElement = t_OOAN2[i-1]
         
         // If this condition is satisfied code will go in to switch
-        if(!(i == 0 || (prevElement && prevElement.operation != "factorial" && (prevElement.operation || prevElement.argSplitter)))){ continue }
+        if(!(i == 0 || (prevElement && prevElement.operation != "factorial" && prevElement.operation != "percentage" && (prevElement.operation || prevElement.argSplitter)))){ continue }
         // Check operation specific properties
         switch (e.operation) {
             case "substract":{
