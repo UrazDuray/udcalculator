@@ -12,7 +12,9 @@ const argSplitter = ','
 
 // Debug
 const debugMode = true
+const testAllOnStart = false
 const debugTurnOffCurrencyApi = true
+
 //CalculatorInputDivElement.textContent = "<1,-2,3>crossp<1,5,7>"
 
 const operationsData = [
@@ -124,6 +126,21 @@ const unitsData = [
     {unit: "hour", symbols: ["h"], category: "time", equivalentValue: 3600, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hour}[#6dfc74]{to}[#dec64e]{s}"], description: "-"},
     {unit: "minute", symbols: ["min", "minute"], category: "time", equivalentValue: 60, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hour}[#6dfc74]{to}[#dec64e]{s}"], description: "-"},
     {unit: "second", symbols: ["s"], category: "time", equivalentValue: 1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{s}[#6dfc74]{to}[#dec64e]{hour}"], description: "-"},
+]
+
+const formulasData = [
+    {formula: "f=ma", displayName: "Newton's second law", category: "physics", description: "-", displayOperation: "b{F} = b{m} * b{a}",
+    formulaElements: [
+        {symbol: "F", name: "force", operationToFind: "mass*acceleration"},
+        {symbol: "m", name: "mass", operationToFind: "force/acceleration"},
+        {symbol: "a", name: "acceleration", operationToFind: "force/mass"},
+    ]},
+    {formula: "t=fx", displayName: "Torque", category: "physics", description: "-", displayOperation: "b{T} = b{F} * b{x}",
+    formulaElements: [
+        {symbol: "T", name: "torque", operationToFind: "force*distance"},
+        {symbol: "F", name: "force", operationToFind: "torque/distance"},
+        {symbol: "x", name: "distance", operationToFind: "torque/force"},
+    ]}
 ]
 
 let customVariableId = 0
@@ -1021,6 +1038,12 @@ function ReCalculatorInput(){
     CalculatorOnInput(lastCalculatorInput, false)
 }
 
+function ChangeCalculatorInput(string){
+    CalculatorInputDivElement.textContent = string
+    lastCalculatorInput = string
+    CalculatorOnInput(string, false)
+}
+
 function AdditionalMenuToggle(open, index){
     if(open){
         //get currency api
@@ -1225,9 +1248,9 @@ const CustomVariablesListDivElement = document.getElementById("CustomVariablesLi
 function AddCustomVariable(){
     CustomVariablesListDivElement.innerHTML += `
         <div id="CustomVariableDiv${customVariableId}" class="CustomVaraibleDivClass CustomVaraibleDivStartAnimClass">
-            <div contenteditable="true" oninput="CustomVariableOnInput(this.id, this.textContent)" id="CustomVaraibleSymbolInput${customVariableId}" class="CustomVariableInputClass" type="text"></div>
+            <div spellcheck="false" contenteditable="true" oninput="CustomVariableOnInput(this.id, this.textContent)" id="CustomVaraibleSymbolInput${customVariableId}" class="CustomVariableInputClass" type="text"></div>
             <span class="CustomVariableSpanClass">&nbsp=&nbsp</span>
-            <div contenteditable="true" oninput="CustomVariableOnInput(this.id, this.textContent)" id="CustomVaraibleValueInput${customVariableId}" class="CustomVariableInputClass" type="text"></div>
+            <div spellcheck="false" contenteditable="true" oninput="CustomVariableOnInput(this.id, this.textContent)" id="CustomVaraibleValueInput${customVariableId}" class="CustomVariableInputClass" type="text"></div>
             <button onclick="RemoveCustomVariable(${customVariableId})" class="CustomVariableDeleteButtonClass"></button>
             <div id="CustomVariableErrorDiv${customVariableId}" class="CustomVariableErrorDivClass"></div>
         </div>`
@@ -1237,52 +1260,63 @@ function AddCustomVariable(){
         beforeLastElement.classList.remove("CustomVaraibleDivStartAnimClass")
     }
 
-customVariables.push({symbol: undefined, value: undefined, color: "#3f6ad9", id: customVariableId})
+    customVariables.push({symbol: undefined, value: undefined, color: "#3f6ad9", id: customVariableId})
     customVariableId++
 }
 
-function CustomVariableOnInput(id, content){
+function EditLastCustomVariable(symbol, value){
+    const lastVariableId = CustomVariablesListDivElement.children[CustomVariablesListDivElement.children.length-1].id
+    const realId = lastVariableId.substring("CustomVariableDiv".length)
+
+    document.getElementById("CustomVaraibleSymbolInput" + realId).textContent = symbol
+    document.getElementById("CustomVaraibleValueInput" + realId).textContent = value
+
+    CustomVariableOnInput("CustomVaraibleSymbolInput" + realId, symbol)
+    CustomVariableOnInput("CustomVaraibleValueInput" + realId, symbol)
+}
+
+function CustomVariableOnInput(id){
     realId = id.substring(id.indexOf("Input") + 5)
     let customVariableData = customVariables.find(x => x.id == realId)
     
-    if(id.includes("Symbol")){
-        if(!isNaN(content) && content != ""){ ThrowErrorCodeForVariables("Can't use a number as variable name", realId);  return}
-        if(content.includes(placeHolderChar)){ ThrowErrorCodeForVariables(`Variable name can't contain '${placeHolderChar}' character`, realId);  return}
-        if(content.includes("<") || content.includes(">")){ ThrowErrorCodeForVariables(`Variable name can't contain '<' or '>' characters`, realId);  return}
+    const symbol = document.getElementById("CustomVaraibleSymbolInput" + realId).textContent
+    const value = document.getElementById("CustomVaraibleValueInput" + realId).textContent
 
-        //check if same variable name exists
-        for (let i = 0; i < customVariables.length; i++) {
-            const e = customVariables[i];
-            if(e.symbol == content && e.id != realId){
-                ThrowErrorCodeForVariables("This variable name already exists", realId)
-                return
-            }
+    //check for name
+    if(!isNaN(symbol) && symbol != ""){ ThrowErrorCodeForVariables("Can't use a number as variable name", realId);  return}
+    if(symbol.includes(placeHolderChar)){ ThrowErrorCodeForVariables(`Variable name can't contain '${placeHolderChar}' character`, realId);  return}
+    if(symbol.includes("<") || symbol.includes(">")){ ThrowErrorCodeForVariables(`Variable name can't contain '<' or '>' characters`, realId);  return}
+    //check if same variable name exists
+    for (let i = 0; i < customVariables.length; i++) {
+        const e = customVariables[i];
+        if(e.symbol == symbol && e.id != realId){
+            ThrowErrorCodeForVariables("This variable name already exists", realId)
+            return
         }
-
-        //check if variable name conflicts with operations or special numbers
-        for (let i = 0; i < operationsData.length; i++) {
-            const e = operationsData[i];
-            if(e.symbols.includes(content)){
-                ThrowErrorCodeForVariables("Variable name conflicts with operation symbol", realId);
-                return
-            }   
-        }
-        for (let i = 0; i < specialNumbersData.length; i++) {
-            const e = specialNumbersData[i];
-            if(e.symbols.includes(content)){
-                ThrowErrorCodeForVariables("Variable name conflicts with special number symbol", realId);
-                return
-            }   
-        }
-
-        customVariableData.symbol = content
     }
-    else{
-        if(content == ""){ ThrowErrorCodeForVariables("Variable must have a value", realId);  return }
-        if(isNaN(content)){ ThrowErrorCodeForVariables("Value of the variable must be a number", realId);  return }
-        customVariableData.value = parseFloat(content)
+    //check if variable name conflicts with operations or special numbers
+    for (let i = 0; i < operationsData.length; i++) {
+        const e = operationsData[i];
+        if(e.symbols.includes(symbol)){
+            ThrowErrorCodeForVariables("Variable name conflicts with operation symbol", realId);
+            return
+        }   
     }
+    for (let i = 0; i < specialNumbersData.length; i++) {
+        const e = specialNumbersData[i];
+        if(e.symbols.includes(symbol)){
+            ThrowErrorCodeForVariables("Variable name conflicts with special number symbol", realId);
+            return
+        }   
+    }
+    customVariableData.symbol = symbol
+    
+    //check for content
+    if(value == ""){ ThrowErrorCodeForVariables("Variable must have a value", realId);  return }
+    if(isNaN(value)){ ThrowErrorCodeForVariables("Value of the variable must be a number", realId);  return }
+    customVariableData.value = parseFloat(value)
 
+    //check general
     if(customVariableData.symbol == "" || customVariableData.symbol == undefined){
         ThrowErrorCodeForVariables("Variable must have a name", realId)
         return
@@ -2015,3 +2049,118 @@ document.addEventListener("keydown",(e)=>{
 
 //#endregion
 
+//#region Formulas
+const formulasDivElement = document.getElementById("formulasDiv")
+GenerateAllFormulas()
+function GenerateAllFormulas(){
+    let currentCategory
+    for (let i = 0; i < formulasData.length; i++) {
+        const f = formulasData[i];
+        const richText = DisplayOperationToRichText(f.displayOperation, f.formula)
+        if(currentCategory != f.category){
+            currentCategory = f.category
+            formulasDivElement.innerHTML +=  `<div class="formulasCategoryTitleClass">${currentCategory[0].toUpperCase() + currentCategory.substring(1)}</div><br>`
+        }
+        formulasDivElement.innerHTML +=  `
+        <div id="formulaDiv${f.formula}" class="formulaDivClass">
+            <span class="formulaDivDisplayNameClass">${f.displayName}</span>
+            ${richText}
+        </div>`
+    }
+}
+
+function DisplayOperationToRichText(displayOperation, formula) {
+    let searchMode
+    let searchModeIndex
+    let stringInsideParanthese = ""
+    let foundElements = []
+    const formulaData = formulasData.find(x => x.formula == formula)
+
+    for (let i = 0; i < displayOperation.length; i++) {
+        const char = displayOperation[i];
+        if(searchMode == undefined){
+            if(char == "{"){
+                searchModeIndex = i-1
+                searchMode = displayOperation[searchModeIndex]
+                searchinForEndParanthese = true
+            }
+        }
+        else{
+            if(char == "}"){
+                foundElements.push({mode: searchMode, symbol: stringInsideParanthese, index: searchModeIndex})
+                searchMode = undefined
+                stringInsideParanthese = ""
+            }
+            else{
+                stringInsideParanthese += char
+            }
+        }
+    }
+    
+    let indexShift = 0
+    for (let i = 0; i < foundElements.length; i++) {
+        const e = foundElements[i];
+        const eData = formulaData.formulaElements.find(x => x.symbol == e.symbol)
+        let contentToReplace
+        if(e.mode == 'b'){
+            contentToReplace = `<button title="${eData.name}" onclick="FormulaButtonOnClick('${formula}', '${e.symbol}')" class="formulaButtonClass">${e.symbol}</button>`
+        }
+        const startIndex = e.index + indexShift
+        displayOperation = displayOperation.substring(0, startIndex) + contentToReplace + displayOperation.substring(startIndex + e.mode.length + 3)
+        indexShift += contentToReplace.length - e.mode.length - 3
+    }
+    return displayOperation
+}
+
+function FormulaButtonOnClick(formula, symbol){
+    const formulaElements = formulasData.find(x => x.formula == formula).formulaElements
+    let solveFor
+    let parametersToAdd = []
+    formulaElements.forEach(fe => {
+        if(fe.symbol == symbol){
+            solveFor = fe
+        }
+        else{
+            parametersToAdd.push(fe)
+        }
+    });
+    
+    let operationString = solveFor.operationToFind
+    parametersToAdd.forEach(p => {
+        AddCustomVariable()
+        EditLastCustomVariable(p.name, "")
+    });
+    
+    ChangeCalculatorInput(operationString)
+    AdditionalMenuToggle(false, 5)
+}
+
+function RemoveAllFormulaDivIndicatorBorders(){
+    for (let i = 0; i < formulasData.length; i++) {
+        const f = formulasData[i];
+        FormulaDivIndicatorBorder(f.formula, false)
+    }
+}
+
+function FormulaDivIndicatorBorder(formula, enable){
+    if(enable){
+        document.getElementById("formulaDiv" + formula).style.border = "5px solid var(--cool-blue)"
+    }
+    else{
+        document.getElementById("formulaDiv" + formula).style.border = "5px solid var(--dark-bc)"
+    }
+}
+
+function FormulaSearch(searchValue){
+    searchValue = searchValue.toLowerCase()
+    RemoveAllFormulaDivIndicatorBorders()
+    for (let i = 0; i < formulasData.length; i++) {
+        const f = formulasData[i];
+        const formulaLower = f.formula.toLowerCase()
+        const displayNameLower = f.displayName.toLowerCase()
+        if(formulaLower.includes(searchValue) || displayNameLower.includes(searchValue)){
+            FormulaDivIndicatorBorder(f.formula, true)
+        }
+    }
+}
+//#endregion

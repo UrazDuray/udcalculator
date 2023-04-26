@@ -17,7 +17,7 @@ const testList = [
     {functionName: "CalculatorOnInput", args: ["vec(1,2,3)", false], expectedOutput: "<1, 2, 3>"},
 ]
 
-if(debugMode) TestAll()
+if(testAllOnStart) TestAll()
 
 function TestAll(){
     console.log("%c---Test started---", "color: #ed8808;")

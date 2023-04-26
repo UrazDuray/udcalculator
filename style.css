@@ -18,7 +18,7 @@
 
     /*region general values */
     --additional-menu-margin: 10px;
-    --cool-blue: rgb(52, 115, 173);
+    --cool-blue: rgb(62, 134, 202);
 }
 
 body{
@@ -96,9 +96,8 @@ body{
     border-radius: 10px;
     outline: none;
     color: var(--dark-font-c);
+    min-width: 100px;
     padding: 10px;
-    width: fit-content;
-    width: 140px;
     margin-bottom: 20px;
 }
 
@@ -368,7 +367,7 @@ body{
     max-width: 200px;
     min-width: 50px;
     outline: 0;
-    padding: 5px;
+    padding: 8px;
     box-sizing: border-box;
     color: var(--dark-font-c);
 }
@@ -590,4 +589,53 @@ body{
 #hueStrip{
     cursor: crosshair;
 }
-/*#enregion*/
+/*#endregion*/
+
+/*#region Formula menu*/
+#formulasDiv{
+    margin-top: 30px;
+    padding: 20px;
+}
+.formulaDivClass{
+    display: inline-block;
+    font-size: 35px;
+    text-align: center;
+    background-color: var(--dark-bc);
+    border-radius: 10px;
+    padding: 10px 15px 15px 15px;
+    margin: 0 20px 20px 0;
+    box-sizing: border-box;
+    border: 5px solid var(--dark-bc);
+    transition-duration: 100ms;
+}
+.formulaButtonClass{
+    border: none;
+    background-color: var(--dark-calc-input-bc);
+    color: var(--dark-font-c);
+    font-size: 25px;
+    padding: 8px 16px 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition-duration: 150ms;
+    user-select: none;
+}
+.formulaButtonClass:hover{
+    background-color: var(--cool-blue);
+}
+.formulaDivDisplayNameClass{
+    font-size: 30px;
+    display: grid;
+    margin-bottom: 10px;
+}
+.formulasCategoryTitleClass{
+    font-size: 40px;
+    width: calc(100vw - 20px);
+    margin-left: -20px;
+    text-align: center;
+}
+#formulasMenuSearchInput{
+    position: fixed;
+    top: 10px;
+    right: 10px;
+}
+/*#endregion*/
