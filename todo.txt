@@ -13,7 +13,6 @@ To do:
 functions:
 - vecrossp problemi
 
-
 Added:
 - Added color picker
 - Added sum of numbers in range

@@ -11,8 +11,8 @@ const CalculatorInputDivElement = document.getElementById("CalculatorInputDiv")
 const argSplitter = ','
 
 // Debug
-const debugMode = true
-const debugTurnOffCurrencyApi = true
+const debugMode = false
+const debugTurnOffCurrencyApi = false
 //CalculatorInputDivElement.textContent = "<1,-2,3>crossp<1,5,7>"
 
 const operationsData = [
@@ -74,7 +74,7 @@ const specialNumbersData = [
     {specialNumber: "infinity", equivalentNumber: (1/0), symbols: ["inf", "infinity", "∞"], examples: ["[#ad6dfc]{inf}", "[#ad6dfc]{infinity}", "[#ad6dfc]{∞}"], color: "#ad6dfc", description: "Infinity"}
 ]
 
-//4 significant figures for weird numbers in equivalentValue
+// 4 significant figures for weird numbers in equivalentValue
 const unitsData = [
     {unit: "celcius", symbols: ["c", "C"], category: "temperature", color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{c}[#6dfc74]{to}[#dec64e]{k}"], description: "-"},
     {unit: "fahrenheit", symbols: ["f", "F"], category: "temperature", color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{f}[#6dfc74]{to}[#dec64e]{k}"], description: "-"},
