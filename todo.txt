@@ -9,6 +9,7 @@ To do:
 - add hsl to color picker
 - add favorite colors
 - add formulas
+- <vector> işlemleri çalışmıyor
 
 
 functions:

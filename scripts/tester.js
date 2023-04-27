@@ -1,5 +1,4 @@
-// Tester Script
-// Every Commit should run the tester
+// Must run the tester before committing
 
 const testList = [
     {functionName: "CalculatorOnInput", args: ["2*-3", false], expectedOutput: -6},
@@ -13,7 +12,7 @@ const testList = [
     {functionName: "CalculatorOnInput", args: ["deg(2*pi)", false], expectedOutput: 360},
     {functionName: "CalculatorOnInput", args: ["lne", false], expectedOutput: 1},
     {functionName: "CalculatorOnInput", args: ["10%", false], expectedOutput: 0.1},
-    {functionName: "CalculatorOnInput", args: ["vec(1,2,3)", false], expectedOutput: "<1, 2, 3>"},
+    {functionName: "CalculatorOnInput", args: ["<1,2,3>crossp<3,4,5>", false], expectedOutput: "<-2, 4, -2>"},
     {functionName: "CalculatorOnInput", args: ["vec(1,2,3)", false], expectedOutput: "<1, 2, 3>"},
 ]
 
@@ -35,9 +34,8 @@ function TestAll(){
             failedTests.push(test)
         }
     }
-    CalculatorInputDivElement.textContent = ""
-    resultSpanElement.textContent = ""
-
+    
+    ChangeCalculatorInput("")
     console.log("Failed tests: ", failedTests)
     console.log(`%cTest ended in ${new Date() - startDate}ms`, "color: #ed8808;")
 }
