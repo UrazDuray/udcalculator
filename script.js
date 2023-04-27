@@ -1459,11 +1459,14 @@ const InAppNotificationDivElement = document.getElementById("InAppNotificationDi
 const InAppNotificationTitleElement = document.getElementById("InAppNotificationTitle")
 const InAppNotificationContentElement = document.getElementById("InAppNotificationContent")
 let inAppNotificationCurrentlyOpen = false
-let inAppNotificationDuration = 3000 //in ms
+let inAppNotificationDuration = 3000  //in ms
 let inAppNotificationsQueue = []
 
 function SendNotification(title, content){
     if(inAppNotificationCurrentlyOpen){
+        if(inAppNotificationsQueue.length > 5){
+            StopQueuedNotifications()
+        }
         inAppNotificationsQueue.push([title, content])
         return 
     }
