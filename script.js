@@ -11,9 +11,14 @@ const CalculatorInputDivElement = document.getElementById("CalculatorInputDiv")
 const argSplitter = ','
 
 // Debug
-const debugMode = true
-const testAllOnStart = true
-const debugTurnOffCurrencyApi = true
+const packageMode = false
+let testAllOnStart = true
+let debugTurnOffCurrencyApi = true
+
+if(packageMode){
+    testAllOnStart = false
+    debugTurnOffCurrencyApi = false
+}
 
 //CalculatorInputDivElement.textContent = "<1,-2,3>crossp<1,5,7>"
 
@@ -613,7 +618,7 @@ function IndexCollisionChecker(limits1, limits2){
 }
 
 let functionsData = []
-operationsData.forEach( e => {s
+operationsData.forEach( e => {
     if(e.category == "function"){
         functionsData.push(e)
     }
