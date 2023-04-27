@@ -69,7 +69,7 @@ function ChangeColorPickerValue(e) {
     rgbaColor = "rgba(" + imageData[0] + ',' + imageData[1] + ',' + imageData[2] + ")";
     UpdateValueInputs(rgbaColor)
     colorPickerValueDivElement.style.backgroundColor = rgbaColor
-}s
+}
 
 function UpdateValueInputs(rgbaColor, currentType){
     if(currentType == "rgb"){
