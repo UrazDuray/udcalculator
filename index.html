@@ -38,6 +38,7 @@
                 <Button style="padding: 15px;" onclick="AdditionalMenuToggle(true, 3)" class="AppButtonClass"><img src="source/electric_icon.png" alt="settings"></Button>
                 <Button style="padding: 15px;" onclick="AdditionalMenuToggle(true, 4)" class="AppButtonClass"><img src="source/color_icon.png" alt="settings"></Button>
                 <Button style="color: #1366E2" onclick="AdditionalMenuToggle(true, 5)" class="AppButtonClass">fx</Button>
+                <Button style="color: #e27a13" onclick="AdditionalMenuToggle(true, 6)" class="AppButtonClass">G</Button>
             </div>
             <div id="AdditionalMenusDiv">
                 <div class="AdditionalMenuCloseClass AdditionalMenuClass scrollBarY" id="helpMenu">
@@ -137,6 +138,10 @@
                     <div class="TitleDivClass">Formulas</div>
                     <input oninput="FormulaSearch(this.value)" placeholder="Search" id="formulasMenuSearchInput" class="inputTextClass" type="text">
                     <div id="formulasDiv"></div>
+                </div>
+                <div class="AdditionalMenuCloseClass AdditionalMenuClass scrollBarY" id="formulasMenu">
+                    <button onclick="AdditionalMenuToggle(false, 6)" class="AdditionalMenuCloseButton">❌</button>
+                    <div class="TitleDivClass">Graphic</div>
                 </div>
             </div>
         </div>

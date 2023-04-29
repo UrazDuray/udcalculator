@@ -8,11 +8,10 @@ To do:
 - calculation inside variable value
 - add hsl to color picker
 - add favorite colors
-- add formulas
-- <vector> işlemleri çalışmıyor
-
+- formula için daha kolay bir yol
 
 functions:
 - vecrossp problemi
 
 Added:
+- add formulas
