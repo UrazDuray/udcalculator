@@ -67,6 +67,9 @@ function hsv2rgb(hsv) {
     }
     return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)]
 }
-
-
 //#endregion
+
+function FirstLetterUpperCase(text){
+    return text[0].toUpperCase() + text.substring(1)
+}
+

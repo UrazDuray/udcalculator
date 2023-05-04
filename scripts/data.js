@@ -111,16 +111,54 @@ const unitsData = [
 ]
 
 const formulasData = [
-    {formula: "f=ma", displayName: "Newton's second law", category: "physics", description: "-", displayOperation: "b{F} = b{m} * b{a}",
+    {displayName: "Velocity", category: "physics", subcategory: "motion", description: "-", displayOperation: "b{v} = b{x} * b{t}",
     formulaElements: [
-        {symbol: "F", name: "force", operationToFind: "mass*acceleration"},
-        {symbol: "m", name: "mass", operationToFind: "force/acceleration"},
-        {symbol: "a", name: "acceleration", operationToFind: "force/mass"},
+        {symbol: "v", name: "velocity", operationToFind: "x*t"},
+        {symbol: "x", name: "distance", operationToFind: "v/t"},
+        {symbol: "t", name: "time", operationToFind: "v/x"},
     ]},
-    {formula: "t=fx", displayName: "Torque", category: "physics", description: "-", displayOperation: "b{T} = b{F} * b{x}",
+    {displayName: "Newton's second law", category: "physics", subcategory: "basic", description: "-", displayOperation: "b{F} = b{m} * b{a}",
     formulaElements: [
-        {symbol: "T", name: "torque", operationToFind: "force*distance"},
-        {symbol: "F", name: "force", operationToFind: "torque/distance"},
-        {symbol: "x", name: "distance", operationToFind: "torque/force"},
+        {symbol: "F", name: "force", operationToFind: "m*a"},
+        {symbol: "m", name: "mass", operationToFind: "F/a"},
+        {symbol: "a", name: "acceleration", operationToFind: "F/m"},
+    ]},
+    {displayName: "Torque", category: "physics", subcategory: "basic", description: "-", displayOperation: "b{T} = b{F} * b{d}",
+    formulaElements: [
+        {symbol: "T", name: "torque", operationToFind: "F*d"},
+        {symbol: "F", name: "force", operationToFind: "T/d"},
+        {symbol: "d", name: "distance", operationToFind: "T/F"},
+    ]},
+    {displayName: "Ohm's Law", category: "physics", subcategory: "electricity", description: "-", displayOperation: "b{V} = b{I} * b{R}",
+    formulaElements: [
+        {symbol: "V", name: "voltage", operationToFind: "I*R"},
+        {symbol: "I", name: "current", operationToFind: "V/R"},
+        {symbol: "R", name: "resistance", operationToFind: "V/I"},
+    ]},
+    {displayName: "Ideal Gas Law", category: "physics", subcategory: "thermodynamics", description: "-", displayOperation: "b{P} * b{V} = b{n} * b{R} * b{T}",
+    formulaElements: [
+        {symbol: "P", name: "pressure", operationToFind: "n*R*T/V"},
+        {symbol: "V", name: "volume", operationToFind: "n*R*T/P"},
+        {symbol: "n", name: "amount of substance", operationToFind: "P*V/R*T"}, 
+        {symbol: "R", name: "gas constant", operationToFind: "P*V/n/T"},
+        {symbol: "T", name: "temperature", operationToFind: "P*V/n/R"},
+    ]},
+    {displayName: "Wavelength", category: "physics", subcategory: "waves", description: "-", displayOperation: "b{λ} = b{v} / b{f}",
+    formulaElements: [
+        {symbol: "λ", name: "wavelength", operationToFind: "v/f"},
+        {symbol: "v", name: "velocity", operationToFind: "λ*f"},
+        {symbol: "f", name: "frequency", operationToFind: "v/λ"},
+    ]},
+    {displayName: "Einstein's Mass-Energy Equivalence", category: "physics", subcategory: "relativity", description: "-", displayOperation: "b{E} = b{m} * b{c}^2",
+    formulaElements: [
+        {symbol: "E", name: "energy", operationToFind: "m*c^2"},
+        {symbol: "m", name: "mass", operationToFind: "E/c^2"},
+        {symbol: "c", name: "speed of light", operationToFind: "r(E/m)"},
+    ]},
+    {displayName: "Pythagorean Theorem", category: "mathematics", subcategory: "geometry", description: "-", displayOperation: "b{c} = r(b{a}^2 + b{b}^2)",
+    formulaElements: [
+        {symbol: "c", name: "hypotenuse", operationToFind: "r(a^2 + b^2)"},
+        {symbol: "a", name: "side a", operationToFind: "r(c^2 - b^2)"},
+        {symbol: "b", name: "side b", operationToFind: "r(c^2 - a^2)"},
     ]}
 ]

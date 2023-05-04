@@ -1944,30 +1944,83 @@ document.addEventListener("keydown",(e)=>{
 
 //#region Formulas
 const formulasDivElement = document.getElementById("formulasDiv")
+let createdFormulaCategories = []
+let createdFormulaSubcategories = []
 GenerateAllFormulas()
 function GenerateAllFormulas(){
-    let currentCategory
     for (let i = 0; i < formulasData.length; i++) {
         const f = formulasData[i];
-        const richText = DisplayOperationToRichText(f.displayOperation, f.formula)
-        if(currentCategory != f.category){
-            currentCategory = f.category
-            formulasDivElement.innerHTML +=  `<div class="formulasCategoryTitleClass">${currentCategory[0].toUpperCase() + currentCategory.substring(1)}</div><br>`
+        const richText = DisplayOperationToRichText(f.displayOperation, i)
+        const currentCategory = f.category
+        const currentSubcategory = f.subcategory
+        if(!createdFormulaCategories.includes(currentCategory)){
+            formulasDivElement.innerHTML +=  `
+            <button id="categoryButton${currentCategory}" onclick="ToggleFormulaCategory('formulaCategory${currentCategory}')" class="categoryButtonClass category-subcategoryButtonClass category-subcategoryButtonCloseClass">${FirstLetterUpperCase(currentCategory)}</button>
+            <div class="categoryDivClass category-subcategoryDivCloseClass" id="formulaCategory${currentCategory}"></div>
+            `
+            createdFormulaCategories.push(currentCategory)
         }
-        formulasDivElement.innerHTML +=  `
-        <div id="formulaDiv${f.formula}" class="formulaDivClass">
+        if(!createdFormulaSubcategories.includes(currentSubcategory)){
+            document.getElementById("formulaCategory" + currentCategory).innerHTML +=  `
+            <button id="subcategoryButton${currentSubcategory}"  onclick="ToggleFormulaCategory('formulaSubcategory${currentSubcategory}')" class="subcategoryButtonClass category-subcategoryButtonClass category-subcategoryButtonCloseClass">${FirstLetterUpperCase(currentSubcategory)}</button>
+            <div class="subcategoryDivClass category-subcategoryDivCloseClass" id="formulaSubcategory${currentSubcategory}"></div>
+            `
+            createdFormulaSubcategories.push(currentSubcategory)
+        }
+        document.getElementById("formulaSubcategory" + currentSubcategory).innerHTML +=  `
+        <div id="formulaDiv${i}" class="formulaDivClass">
             <span class="formulaDivDisplayNameClass">${f.displayName}</span>
             ${richText}
         </div>`
     }
 }
 
-function DisplayOperationToRichText(displayOperation, formula) {
+function ToggleFormulaCategory(id, forceOpen){
+    const e = document.getElementById(id)
+    let idPrefix, realId
+    if(id.includes("Sub")){
+        realId = id.substring(18)
+        idPrefix = "subcategoryButton"
+    }
+    else{
+        realId = id.substring(15)
+        idPrefix = "categoryButton"
+    }
+    
+    const buttonE = document.getElementById(idPrefix + realId)
+    const openDiv = forceOpen != undefined ? forceOpen : e.classList.contains("category-subcategoryDivCloseClass")
+
+    if(openDiv){
+        e.classList.remove("category-subcategoryDivCloseClass")
+        e.classList.add("category-subcategoryDivOpenClass")
+
+        buttonE.classList.remove("category-subcategoryButtonCloseClass")
+        buttonE.classList.add("category-subcategoryButtonOpenClass")
+    }
+    else{
+        e.classList.remove("category-subcategoryDivOpenClass")
+        e.classList.add("category-subcategoryDivCloseClass")
+
+        buttonE.classList.remove("category-subcategoryButtonOpenClass")
+        buttonE.classList.add("category-subcategoryButtonCloseClass")
+    }
+}
+
+function ToggleAllFormulaCategories(state){
+    createdFormulaCategories.forEach(e => {
+        ToggleFormulaCategory("formulaCategory" + e, state)
+    });
+    createdFormulaSubcategories.forEach(e => {
+        ToggleFormulaCategory("formulaSubcategory" + e, state)
+    });
+}
+
+function DisplayOperationToRichText(displayOperation, formulaIndex) {
     let searchMode
     let searchModeIndex
     let stringInsideParanthese = ""
     let foundElements = []
-    const formulaData = formulasData.find(x => x.formula == formula)
+    const formulaData = formulasData[formulaIndex]
 
     for (let i = 0; i < displayOperation.length; i++) {
         const char = displayOperation[i];
@@ -1996,7 +2049,7 @@ function DisplayOperationToRichText(displayOperation, formula) {
         const eData = formulaData.formulaElements.find(x => x.symbol == e.symbol)
         let contentToReplace
         if(e.mode == 'b'){
-            contentToReplace = `<button title="${eData.name}" onclick="FormulaButtonOnClick('${formula}', '${e.symbol}')" class="formulaButtonClass">${e.symbol}</button>`
+            contentToReplace = `<button title="${eData.name}" onclick="FormulaButtonOnClick('${formulaIndex}', '${e.symbol}')" class="formulaButtonClass">${e.symbol}</button>`
         }
         const startIndex = e.index + indexShift
         displayOperation = displayOperation.substring(0, startIndex) + contentToReplace + displayOperation.substring(startIndex + e.mode.length + 3)
@@ -2005,23 +2058,31 @@ function DisplayOperationToRichText(displayOperation, formula) {
     return displayOperation
 }
 
-function FormulaButtonOnClick(formula, symbol){
-    const formulaElements = formulasData.find(x => x.formula == formula).formulaElements
+function FormulaButtonOnClick(formulaIndex, symbol){
+    const formulaElements = formulasData[formulaIndex].formulaElements
     let solveFor
     let parametersToAdd = []
-    formulaElements.forEach(fe => {
+
+    for (let i = 0; i < formulaElements.length; i++) {
+        const fe = formulaElements[i];
         if(fe.symbol == symbol){
             solveFor = fe
         }
         else{
             parametersToAdd.push(fe)
-        }
-    });
+        }   
+    }
     
     let operationString = solveFor.operationToFind
+    let temp_operationString = operationString
+    let indexShift = 0
     parametersToAdd.forEach(p => {
         AddCustomVariable()
         EditLastCustomVariable(p.name, "")
+        const indexOfParameter = temp_operationString.indexOf(p.symbol)
+        operationString = operationString.substring(0, indexOfParameter + indexShift) + p.name + operationString.substring(indexOfParameter + p.symbol.length + indexShift)
+        temp_operationString = ReplaceWithPlaceHoldersAtIndex(temp_operationString, indexOfParameter, placeHolderChar, p.symbol.length)
+        indexShift += p.name.length - p.symbol.length
     });
     
     ChangeCalculatorInput(operationString)
@@ -2030,29 +2091,34 @@ function FormulaButtonOnClick(formula, symbol){
 
 function RemoveAllFormulaDivIndicatorBorders(){
     for (let i = 0; i < formulasData.length; i++) {
-        const f = formulasData[i];
-        FormulaDivIndicatorBorder(f.formula, false)
+        FormulaDivIndicatorBorder(i, false)
     }
 }
 
-function FormulaDivIndicatorBorder(formula, enable){
+function FormulaDivIndicatorBorder(formulaIndex, enable){
     if(enable){
-        document.getElementById("formulaDiv" + formula).style.border = "5px solid var(--cool-blue)"
+        document.getElementById("formulaDiv" + formulaIndex).style.border = "5px solid var(--cool-blue)"
     }
     else{
-        document.getElementById("formulaDiv" + formula).style.border = "5px solid var(--dark-bc)"
+        document.getElementById("formulaDiv" + formulaIndex).style.border = "5px solid var(--dark-bc)"
     }
 }
 
 function FormulaSearch(searchValue){
+    if(searchValue == ""){ searchValue = placeHolderChar}
     searchValue = searchValue.toLowerCase()
+    
     RemoveAllFormulaDivIndicatorBorders()
+    if(searchValue == "all"){ ToggleAllFormulaCategories(true); return }
+    
+    ToggleAllFormulaCategories(false)
     for (let i = 0; i < formulasData.length; i++) {
         const f = formulasData[i];
-        const formulaLower = f.formula.toLowerCase()
         const displayNameLower = f.displayName.toLowerCase()
-        if(formulaLower.includes(searchValue) || displayNameLower.includes(searchValue)){
-            FormulaDivIndicatorBorder(f.formula, true)
+        if(displayNameLower.includes(searchValue)){
+            FormulaDivIndicatorBorder(i, true)
+            ToggleFormulaCategory("formulaCategory" + f.category, true)
+            ToggleFormulaCategory("formulaSubcategory" + f.subcategory, true)
         }
     }
 }

@@ -606,7 +606,7 @@ body{
     margin: 0 20px 20px 0;
     box-sizing: border-box;
     border: 5px solid var(--dark-bc);
-    transition-duration: 100ms;
+    transition-duration: 150ms;
 }
 .formulaButtonClass{
     border: none;
@@ -637,5 +637,50 @@ body{
     position: fixed;
     top: 10px;
     right: 10px;
+}
+
+.categoryDivClass{
+    margin: 0;
+    transition-duration: 200ms;
+    border-radius: 10px;
+}
+.subcategoryDivClass{
+    margin: 0;
+    transition-duration: 200ms;    
+    border-radius: 10px;
+}
+.category-subcategoryDivOpenClass{
+    max-height: 10000px;
+    opacity: 1;
+    visibility: visible;
+}
+.category-subcategoryDivCloseClass{
+    max-height: 0;
+    opacity: 0;
+    visibility: collapse;
+}
+
+.categoryButtonClass{
+    font-size: 40px;
+}
+.subcategoryButtonClass{
+    font-size: 30px;
+}
+.category-subcategoryButtonClass{
+    width: calc(100vw - 66px);
+    text-align: center;
+    display: block;
+    background-color: transparent;
+    border: none;
+    color: var(--dark-font-c);
+    cursor: pointer;
+    transition-duration: 200ms;
+    border-radius: 10px;
+}
+.category-subcategoryButtonOpenClass{
+    opacity: 1;
+}
+.category-subcategoryButtonCloseClass{
+    opacity: 0.5;
 }
 /*#endregion*/
