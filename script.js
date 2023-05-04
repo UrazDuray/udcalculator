@@ -871,6 +871,7 @@ function ColoredTextGenerator(text){
     }
 
     let indexShift = 0
+    console.log(coloringData)
     coloringData.forEach(e => {
         const color = e.color
         const string = e.string
