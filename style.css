@@ -639,3 +639,81 @@ body{
     right: 10px;
 }
 /*#endregion*/
+
+/*#region plotter*/
+
+.PlotterContainerDiv{
+    display: flex;
+    width: 100vh;
+    height: 100vh;
+
+}
+
+
+.FunctionsDivClass{
+    display: flex;
+    background-color: var(--dark-bc); 
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 0px 0 10px;
+    width: calc(100vw - 40px);
+    font-size: 40px;
+    height: 80px;
+    box-sizing: border-box;
+}
+
+.PlotterDivClass{
+    display: flex;
+    background-color: var(--dark-bc); 
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 0px 0 10px;
+    width: calc(100vw - 40px);
+    box-sizing: border-box;
+    position: absolute;
+    bottom: 10px;
+    top: 155px;
+    
+}
+
+.FunctionsFXClass{
+    display: flex;
+    background-color: var(--dark-bc); 
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 0px 0 10px;
+    width: 80px;
+    font-size: 40px;
+    height: 80px;
+    box-sizing: border-box;
+}
+
+.FunctionsEqualsClass{
+    display: flex;
+    background-color: var(--dark-area-bc); 
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 0px 0 10px;
+    width: 40px;
+    font-size: 40px;
+    height: 80px;
+    box-sizing: border-box;
+}
+
+.FunctionInputDiv{
+    display: grid;
+    position: absolute;
+    height: 80px;
+    grid-template-columns: 80px 40px 1fr;
+    grid-template-rows: 80px;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+}
+
+
+#c{
+    width: 100%;
+    height: 100%;
+}
+
+/*#endregion*/
