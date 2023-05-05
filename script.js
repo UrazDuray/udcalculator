@@ -32,9 +32,10 @@ CalculatorInputDivElement.addEventListener('wheel', e => {
     CalculatorInputDivElement.scrollLeft += e.deltaY/3;
 })
 
-function CalculatorOnInput(input, restoreCursorPlace){
+function CalculatorOnInput(inputDiv, restoreCursorPlace,useCustomVariables,resultDivID = undefined,){
     // Measure calculation speed
     //const startDate = new Date()
+    input = inputDiv.textContent
 
     lastCalculatorInput = input
     incorrectInput = false
@@ -53,7 +54,7 @@ function CalculatorOnInput(input, restoreCursorPlace){
     // Find orderedOperations
     orderedByParantheseArray.forEach(e => {
        const insideParanthese = input.slice(e[0]+1, e[1])
-       const operationsFound = FindOperations(insideParanthese, e[0]+1)
+       const operationsFound = FindOperations(insideParanthese, e[0]+1,useCustomVariables);
        if(operationsFound == undefined) { return }
 
        operationsFound.forEach(e => {
@@ -142,13 +143,16 @@ function CalculatorOnInput(input, restoreCursorPlace){
         }
     }
 
+    ColorizeInput(input,inputDiv, [...orderedOperationsAndNumbers], restoreCursorPlace)
+    
     const result = Calculate(input, [...orderedOperations], [...orderedOperationsAndNumbers])
-    if(!incorrectInput){
-        document.getElementById("resultSpan").style.color = initialInputColor
-        document.getElementById("resultSpan").textContent = RemoveMinusEFromNumbers(result)
+    if(!resultDivID&&!incorrectInput){
+        return {input:input, ordop:[...orderedOperations],ordopnum: [...orderedOperationsAndNumbers]}
+    }else if(!incorrectInput){
+        document.getElementById(resultDivID).style.color = initialInputColor
+        document.getElementById(resultDivID).textContent = RemoveMinusEFromNumbers(result)
     }
 
-    ColorizeInput(input, [...orderedOperationsAndNumbers], restoreCursorPlace)
     
     // Measure calculation speed
     //console.log(`Calculated in ${new Date() - startDate}ms`)
@@ -448,10 +452,10 @@ function ApplyConversion(unit1Data, unit2Data, value){
     }
 }
 
-function ColorizeInput(input, orderedOperationsAndNumbers, restoreCursorPlace){
+function ColorizeInput(input,inputDiv, orderedOperationsAndNumbers, restoreCursorPlace){
     input = input.substring(1, input.length-1)
     let indexShift = 0
-    SaveCursorPlace()
+    SaveCursorPlace(inputDiv)
 
     let listToColorize = orderedOperationsAndNumbers.concat(unitsToColorize)
     listToColorize.sort(({index:a}, {index:b}) => a-b)
@@ -477,13 +481,13 @@ function ColorizeInput(input, orderedOperationsAndNumbers, restoreCursorPlace){
         }
     }
 
-    document.getElementById("CalculatorInputDiv").innerHTML = input
+    inputDiv.innerHTML = input
 
     if(!restoreCursorPlace){ return }
-    RestoreCursorPlace()
+    RestoreCursorPlace(inputDiv)
 }
 
-function FindOperations(input, indexShift){
+function FindOperations(input, indexShift,useCustomVariables){
     if(input.length == 0){ return }
     let orderedOperations = []
     
@@ -502,22 +506,26 @@ function FindOperations(input, indexShift){
     });
 
     //find custom variables
-    customVariables.forEach(e => {
-        let temporaryInput = input
-        let tempShift = 0
-        while (true) {
-            const index = temporaryInput.indexOf(e.symbol)
-            if(index == -1){ break}
-            const symbolString = e.symbol
-
-            const customVariableData = customVariables.find(x => x.symbol == symbolString)
-
-            orderedOperations.push({number: customVariableData.value, symbol: symbolString, index: index + indexShift - 1 + tempShift, customVariable: true}) //index + indexShift - 1: 1-> baştaki parantez için
-            let symbolLength = symbolString.length
-            temporaryInput = temporaryInput.substring(0, index) + temporaryInput.substring(index + symbolLength)
-            tempShift += symbolLength
-        }
-    });
+    if(useCustomVariables){
+        console.log("custom vars")
+        customVariables.forEach(e => {
+            let temporaryInput = input
+            let tempShift = 0
+            while (true) {
+                const index = temporaryInput.indexOf(e.symbol)
+                if(index == -1){ break}
+                const symbolString = e.symbol
+    
+                const customVariableData = customVariables.find(x => x.symbol == symbolString)
+    
+                orderedOperations.push({number: customVariableData.value, symbol: symbolString, index: index + indexShift - 1 + tempShift, customVariable: true}) //index + indexShift - 1: 1-> baştaki parantez için
+                let symbolLength = symbolString.length
+                temporaryInput = temporaryInput.substring(0, index) + temporaryInput.substring(index + symbolLength)
+                tempShift += symbolLength
+            }
+        });
+    }
+    
 
     // Check for collisions
     let operationsToBeDeleted = []
@@ -871,7 +879,7 @@ function ColoredTextGenerator(text){
     }
 
     let indexShift = 0
-    console.log(coloringData)
+
     coloringData.forEach(e => {
         const color = e.color
         const string = e.string
@@ -1125,13 +1133,13 @@ if (window.getSelection && document.createRange) {
 
 var savedSelection = {start: 0, end: 0};
 
-function SaveCursorPlace() {
-    savedSelection = saveSelection( document.getElementById("CalculatorInputDiv") );
+function SaveCursorPlace(div) {
+    savedSelection = saveSelection(div);
 }
 
-function RestoreCursorPlace() {
+function RestoreCursorPlace(div) {
     if (savedSelection) {
-        restoreSelection(document.getElementById("CalculatorInputDiv"), savedSelection);
+        restoreSelection(div, savedSelection);
     }
 }
 //#endregion
