@@ -7,6 +7,7 @@ var deltaX = 0;
 var xToScroll = 0
 var canvasX = 0;
 var zoom = 1;
+var resolution = 1;
 plot()
 var operation;
 window.onresize=resizePlotterCanvas
@@ -17,6 +18,9 @@ function resizePlotterCanvas(){
     plotterCanvasElement.height=canvasParent.clientHeight
     plotterCtx.putImageData(tempCanvas,0,0)
 }
+
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
 
 function plot(){
     plotterCtx.clearRect(0,0,plotterCanvasElement.width,plotterCanvasElement.height)
@@ -37,8 +41,11 @@ function plot(){
     plotterCtx.beginPath();
     plotterCtx.moveTo(plotterCanvasElement.width/2*-1,0)
 
+    resolution = 2/zoom
 
-    for(x=plotterCanvasElement.width/2*(1/zoom)*-1;x<plotterCanvasElement.width/2*(1/zoom)+ 5;x+=0.5){
+    console.log("Çizilen nokta miktarı: " + ((plotterCanvasElement.width)*(1/zoom)/resolution))
+
+    for(x=plotterCanvasElement.width/2*(1/zoom)*-1;x<plotterCanvasElement.width/2*(1/zoom)+ 5;x+=resolution){
         plotterCtx.lineTo(x,PlotFunction(x-xToScroll,operation),1,0,Math.PI*2)
     }
 
@@ -110,6 +117,7 @@ if(operation){
 
 //const  mathregex = new RegExp("[a-z](?=.*\(.*?\))","gim")
 const  mathregex = new RegExp("([a-z]){3,}","gi")
+
 function FunctionChanged(func){
     operation = CalculatorOnInput(func,true,false,undefined)
     //console.log(operation)

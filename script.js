@@ -32,10 +32,10 @@ CalculatorInputDivElement.addEventListener('wheel', e => {
     CalculatorInputDivElement.scrollLeft += e.deltaY/3;
 })
 
-function CalculatorOnInput(inputDiv, restoreCursorPlace,useCustomVariables,resultDivID = undefined,){
+function CalculatorOnInput(inputDiv, restoreCursorPlace,resultDivID = "resultSpan"){
     // Measure calculation speed
     //const startDate = new Date()
-    input = inputDiv.textContent
+    input = typeof inputDiv=="string"? inputDiv: inputDiv.textContent
 
     lastCalculatorInput = input
     incorrectInput = false
@@ -54,7 +54,7 @@ function CalculatorOnInput(inputDiv, restoreCursorPlace,useCustomVariables,resul
     // Find orderedOperations
     orderedByParantheseArray.forEach(e => {
        const insideParanthese = input.slice(e[0]+1, e[1])
-       const operationsFound = FindOperations(insideParanthese, e[0]+1,useCustomVariables);
+       const operationsFound = FindOperations(insideParanthese, e[0]+1);
        if(operationsFound == undefined) { return }
 
        operationsFound.forEach(e => {
@@ -486,7 +486,7 @@ function ColorizeInput(input,inputDiv, orderedOperationsAndNumbers, restoreCurso
     RestoreCursorPlace(inputDiv)
 }
 
-function FindOperations(input, indexShift,useCustomVariables){
+function FindOperations(input, indexShift){
     if(input.length == 0){ return }
     let orderedOperations = []
     
@@ -505,8 +505,6 @@ function FindOperations(input, indexShift,useCustomVariables){
     });
 
     //find custom variables
-    if(useCustomVariables){
-        console.log("custom vars")
         customVariables.forEach(e => {
             let temporaryInput = input
             let tempShift = 0
@@ -523,7 +521,7 @@ function FindOperations(input, indexShift,useCustomVariables){
                 tempShift += symbolLength
             }
         });
-    }
+    
     
 
     // Check for collisions
