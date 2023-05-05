@@ -142,7 +142,6 @@ function CalculatorOnInput(inputDiv, restoreCursorPlace,useCustomVariables,resul
                 break;
         }
     }
-
     ColorizeInput(input,inputDiv, [...orderedOperationsAndNumbers], restoreCursorPlace)
     
     const result = Calculate(input, [...orderedOperations], [...orderedOperationsAndNumbers])
