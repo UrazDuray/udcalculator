@@ -37,6 +37,25 @@ function CalculatorOnInput(input, restoreCursorPlace){
     //const startDate = new Date()
 
     lastCalculatorInput = input
+    const calculationResult = Calculation(input, true)
+    document.getElementById("CalculatorInputDiv").innerHTML = calculationResult.htmlColorized
+    if(!calculationResult.incorrectInput){
+        document.getElementById("resultSpan").style.color = initialInputColor
+        document.getElementById("resultSpan").textContent = calculationResult.result
+    }
+    else{
+        document.getElementById("resultSpan").style.color = "red"
+        document.getElementById("resultSpan").textContent = calculationResult.errorString
+    }
+    
+    if(restoreCursorPlace) RestoreCursorPlace()
+    
+    //console.log(`Calculated in ${new Date() - startDate}ms`)
+    return calculationResult.result
+}
+
+let currentErrorString
+function Calculation(input, outputHtmlColorized){
     incorrectInput = false
     input = "(" + input + ")"
 
@@ -84,7 +103,6 @@ function CalculatorOnInput(input, restoreCursorPlace){
     let orderedOperationsAndNumbers = orderedOperations.concat(numbersOrdered)
 
     //find arg splitters
-    //not! <1,2,3> bozuyor
     for (let i = 1; i < input.length; i++) {
         const char = input[i];
         if(char == argSplitter){
@@ -143,16 +161,12 @@ function CalculatorOnInput(input, restoreCursorPlace){
     }
 
     const result = Calculate(input, [...orderedOperations], [...orderedOperationsAndNumbers])
-    if(!incorrectInput){
-        document.getElementById("resultSpan").style.color = initialInputColor
-        document.getElementById("resultSpan").textContent = RemoveMinusEFromNumbers(result)
-    }
 
-    ColorizeInput(input, [...orderedOperationsAndNumbers], restoreCursorPlace)
+    const colorizedInput = outputHtmlColorized ? ColorizeInput(input, [...orderedOperationsAndNumbers]) : undefined
     
     // Measure calculation speed
     //console.log(`Calculated in ${new Date() - startDate}ms`)
-    return result
+    return {result: result, htmlColorized: colorizedInput, incorrectInput: incorrectInput, errorString: currentErrorString}
 }
 
 function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
@@ -448,7 +462,7 @@ function ApplyConversion(unit1Data, unit2Data, value){
     }
 }
 
-function ColorizeInput(input, orderedOperationsAndNumbers, restoreCursorPlace){
+function ColorizeInput(input, orderedOperationsAndNumbers){
     input = input.substring(1, input.length-1)
     let indexShift = 0
     SaveCursorPlace()
@@ -477,10 +491,7 @@ function ColorizeInput(input, orderedOperationsAndNumbers, restoreCursorPlace){
         }
     }
 
-    document.getElementById("CalculatorInputDiv").innerHTML = input
-
-    if(!restoreCursorPlace){ return }
-    RestoreCursorPlace()
+    return input
 }
 
 function FindOperations(input, indexShift){
@@ -888,11 +899,11 @@ function ColoredTextGenerator(text){
 
 function ThrowErrorCode(errorString){
     incorrectInput = true
-    document.getElementById("resultSpan").style.color = "red"
-    document.getElementById("resultSpan").textContent = errorString
+    currentErrorString = errorString
     //console.trace(errorString)
 }
 
+//!not currently not used
 function RemoveMinusEFromNumbers(num){
     if(enableEInResults == true){ return num }
     

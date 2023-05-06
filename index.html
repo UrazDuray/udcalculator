@@ -14,7 +14,7 @@
         </div>
         <div id="GridContainer">
             <div id="CalculatorAreaDiv">
-                <div spellcheck="false" oninput="CalculatorOnInput(this.textContent, true)" contenteditable="true" id="CalculatorInputDiv"></div>
+                <div spellcheck="false" oninput="CalculatorOnInput(this.textContent, this.id, 'resultSpan', true)" contenteditable="true" id="CalculatorInputDiv"></div>
             </div>
             <div id="CalculatorResultAreaDiv">
                 <span id="resultSpan"></span>
@@ -133,7 +133,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="AdditionalMenuOpenClass AdditionalMenuClass scrollBarY" id="formulasMenu">
+                <div class="AdditionalMenuCloseClass AdditionalMenuClass scrollBarY" id="formulasMenu">
                     <button onclick="AdditionalMenuToggle(false, 5)" class="AdditionalMenuCloseButton">❌</button>
                     <div class="TitleDivClass">Formulas</div>
                     <input oninput="FormulaSearch(this.value)" placeholder="Search" id="formulasMenuSearchInput" class="inputTextClass" type="text">
