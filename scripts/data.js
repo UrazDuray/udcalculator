@@ -1,6 +1,5 @@
 
 const operationsData = [
-    
     {operation: "primeCheck", symbols: ["prime"], category: "primeCheck", operationApplianceType: "numberOnRight", examples: ["prime[#36c1f7]{x}"], color: "#6dfc74", description: "Checks if the number is prime. If it is it returns 1 if not 0", priority: 10, vectorCountNeededForOperation: [0]},
     // convert radians to d
     {operation: "degree", symbols: ["deg", "degree"], category: "conversion", operationApplianceType: "numberOnRight", examples: ["deg[#36c1f7]{x}"], color: "#6dfc74", description: "Converts radian to degree", priority: 10, vectorCountNeededForOperation: [0]},
@@ -54,7 +53,6 @@ const operationsData = [
 ]
 
 const specialNumbersData = [
-   {specialNumber: "x", equivalentNumber: "x", symbols: ["x"], examples: ["temp solution will change"], color: "#ad6dfc", description: "function place holder"},
     {specialNumber: "pi", equivalentNumber: Math.PI, symbols: ["pi", "π"], examples: ["[#ad6dfc]{pi}", "[#ad6dfc]{π}"], color: "#ad6dfc", description: "Number π"},
     {specialNumber: "e", equivalentNumber: Math.E, symbols: ["e"], examples: ["[#ad6dfc]{e}"], color: "#ad6dfc", description: "Number e"},
     {specialNumber: "infinity", equivalentNumber: (1/0), symbols: ["inf", "infinity", "∞"], examples: ["[#ad6dfc]{inf}", "[#ad6dfc]{infinity}", "[#ad6dfc]{∞}"], color: "#ad6dfc", description: "Infinity"}
