@@ -13,8 +13,8 @@ var ctx2 = colorStrip.getContext('2d');
 var width2 = colorStrip.width;
 var height2 = colorStrip.height;
 
-var x = 0;
-var y = 0;
+var colorX = 0;
+var colorY = 0;
 var colorPaletteDrag = false;
 var hueStripDrag = false;
 var rgbaColor = 'rgba(255,0,0,1)';
@@ -55,17 +55,17 @@ function fillGradient() {
 function ChangeColorPickerValue(e) {
     if(e == undefined){
         //x, y = lastColorPalettePos[0], lastColorPalettePos[1]
-        x = lastColorPalettePos[0]
-        y = lastColorPalettePos[1]
+        colorX = lastColorPalettePos[0]
+        colorY = lastColorPalettePos[1]
     }
     else{
-        x = e.offsetX;
-        y = e.offsetY;
-        lastColorPalettePos[0] = x
-        lastColorPalettePos[1] = y
+        colorX = e.offsetX;
+        colorY = e.offsetY;
+        lastColorPalettePos[0] = colorX
+        lastColorPalettePos[1] = colorY
     }
 
-    var imageData = ctx1.getImageData(x, y, 1, 1).data;
+    var imageData = ctx1.getImageData(colorX, colorY, 1, 1).data;
     rgbaColor = "rgba(" + imageData[0] + ',' + imageData[1] + ',' + imageData[2] + ")";
     UpdateValueInputs(rgbaColor)
     colorPickerValueDivElement.style.backgroundColor = rgbaColor
@@ -92,9 +92,9 @@ function UpdateValueInputs(rgbaColor, currentType){
 }
 
 function ChangeColorPickerHue(e){
-    x = e.offsetX;
-    y = e.offsetY;
-    var imageData = ctx2.getImageData(x, y, 1, 1).data;
+    colorX = e.offsetX;
+    colorY = e.offsetY;
+    var imageData = ctx2.getImageData(colorX, colorY, 1, 1).data;
     rgbaColor = 'rgba(' + imageData[0] + ',' + imageData[1] + ',' + imageData[2] + ',1)';
     fillGradient();
     ChangeColorPickerValue(undefined)

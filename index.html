@@ -14,7 +14,7 @@
         </div>
         <div id="GridContainer">
             <div id="CalculatorAreaDiv">
-                <div spellcheck="false" oninput="CalculatorOnInput(this.textContent, true)" contenteditable="true" id="CalculatorInputDiv"></div>
+                <div spellcheck="false" oninput="CalculatorOnInput(this,true,true,'resultSpan')" contenteditable="true" id="CalculatorInputDiv"></div>
             </div>
             <div id="CalculatorResultAreaDiv">
                 <span id="resultSpan"></span>
@@ -133,20 +133,21 @@
                         </div>
                     </div>
                 </div>
-                <div class="AdditionalMenuOpenClass AdditionalMenuClass scrollBarY" id="formulasMenu">
+                <div class="AdditionalMenuCloseClass AdditionalMenuClass scrollBarY" id="formulasMenu">
                     <button onclick="AdditionalMenuToggle(false, 5)" class="AdditionalMenuCloseButton">❌</button>
                     <div class="TitleDivClass">Formulas</div>
                     <input oninput="FormulaSearch(this.value)" placeholder="Search" id="formulasMenuSearchInput" class="inputTextClass" type="text">
                     <div id="formulasDiv"></div>
                 </div>
-                <div class="AdditionalMenuCloseClass AdditionalMenuClass scrollBarY" id="graphicsMenu">
+                <div class="AdditionalMenuOpenClass AdditionalMenuClass scrollBarY" id="graphicsMenu">
                     <button onclick="AdditionalMenuToggle(false, 6)" class="AdditionalMenuCloseButton">❌</button>
                     <div class="TitleDivClass">Graphic</div>
                     <div class="PlotterContainterDiv">
                         <div class="FunctionInputDiv">
-                            <div class="FunctionsFXClass">F(<span id="FunctionName" contenteditable="true" oninput="FunctionNameChange(this.textContent)" >x</span>)</div>
+                            <div class="FunctionsFXClass">F(<span id="FunctionName" contenteditable="true" oninput="FunctionNameChanged(this.textContent)" >x</span>)</div>
                             <div class="FunctionsEqualsClass">=</div>
                             <div class="FunctionsDivClass" contenteditable="true" id="FunctionsDiv" oninput="FunctionChanged(this)" data-raw-content="" ></div>
+                            <span id="plotterHiddenResultSpan" style="display: none;"></span>
                         </div>
                         <div class="PlotterDivClass">
                             <canvas id="plotterCanvas" style="background-color: white;"></canvas>
@@ -157,10 +158,11 @@
         </div>
     </body>
     <script src="scripts/data.js"></script>
-
-    <script src="scripts/plotter.js"></script>
     <script src="scripts/generalFunctions.js"></script>
     <script src="script.js"></script>
+    <script src="scripts/plotter.js"></script>
+
+
     <script src="scripts/colorPickerMenu.js"></script>
     <script src="scripts/checkVersion.js"></script>
     <script src="scripts/tester.js"></script>

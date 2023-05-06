@@ -1,6 +1,4 @@
-
 const operationsData = [
-    
     {operation: "primeCheck", symbols: ["prime"], category: "primeCheck", operationApplianceType: "numberOnRight", examples: ["prime[#36c1f7]{x}"], color: "#6dfc74", description: "Checks if the number is prime. If it is it returns 1 if not 0", priority: 10, vectorCountNeededForOperation: [0]},
     // convert radians to d
     {operation: "degree", symbols: ["deg", "degree"], category: "conversion", operationApplianceType: "numberOnRight", examples: ["deg[#36c1f7]{x}"], color: "#6dfc74", description: "Converts radian to degree", priority: 10, vectorCountNeededForOperation: [0]},
@@ -54,7 +52,6 @@ const operationsData = [
 ]
 
 const specialNumbersData = [
-   {specialNumber: "x", equivalentNumber: "x", symbols: ["x"], examples: ["temp solution will change"], color: "#ad6dfc", description: "function place holder"},
     {specialNumber: "pi", equivalentNumber: Math.PI, symbols: ["pi", "π"], examples: ["[#ad6dfc]{pi}", "[#ad6dfc]{π}"], color: "#ad6dfc", description: "Number π"},
     {specialNumber: "e", equivalentNumber: Math.E, symbols: ["e"], examples: ["[#ad6dfc]{e}"], color: "#ad6dfc", description: "Number e"},
     {specialNumber: "infinity", equivalentNumber: (1/0), symbols: ["inf", "infinity", "∞"], examples: ["[#ad6dfc]{inf}", "[#ad6dfc]{infinity}", "[#ad6dfc]{∞}"], color: "#ad6dfc", description: "Infinity"}
@@ -110,57 +107,4 @@ const unitsData = [
     {unit: "hour", symbols: ["h"], category: "time", equivalentValue: 3600, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hour}[#6dfc74]{to}[#dec64e]{s}"], description: "-"},
     {unit: "minute", symbols: ["min", "minute"], category: "time", equivalentValue: 60, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hour}[#6dfc74]{to}[#dec64e]{s}"], description: "-"},
     {unit: "second", symbols: ["s"], category: "time", equivalentValue: 1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{s}[#6dfc74]{to}[#dec64e]{hour}"], description: "-"},
-]
-
-const formulasData = [
-    {displayName: "Velocity", category: "physics", subcategory: "motion", description: "-", displayOperation: "b{v} = b{x} * b{t}",
-    formulaElements: [
-        {symbol: "v", name: "velocity", operationToFind: "x*t"},
-        {symbol: "x", name: "distance", operationToFind: "v/t"},
-        {symbol: "t", name: "time", operationToFind: "v/x"},
-    ]},
-    {displayName: "Newton's second law", category: "physics", subcategory: "basic", description: "-", displayOperation: "b{F} = b{m} * b{a}",
-    formulaElements: [
-        {symbol: "F", name: "force", operationToFind: "m*a"},
-        {symbol: "m", name: "mass", operationToFind: "F/a"},
-        {symbol: "a", name: "acceleration", operationToFind: "F/m"},
-    ]},
-    {displayName: "Torque", category: "physics", subcategory: "basic", description: "-", displayOperation: "b{T} = b{F} * b{d}",
-    formulaElements: [
-        {symbol: "T", name: "torque", operationToFind: "F*d"},
-        {symbol: "F", name: "force", operationToFind: "T/d"},
-        {symbol: "d", name: "distance", operationToFind: "T/F"},
-    ]},
-    {displayName: "Ohm's Law", category: "physics", subcategory: "electricity", description: "-", displayOperation: "b{V} = b{I} * b{R}",
-    formulaElements: [
-        {symbol: "V", name: "voltage", operationToFind: "I*R"},
-        {symbol: "I", name: "current", operationToFind: "V/R"},
-        {symbol: "R", name: "resistance", operationToFind: "V/I"},
-    ]},
-    {displayName: "Ideal Gas Law", category: "physics", subcategory: "thermodynamics", description: "-", displayOperation: "b{P} * b{V} = b{n} * b{R} * b{T}",
-    formulaElements: [
-        {symbol: "P", name: "pressure", operationToFind: "n*R*T/V"},
-        {symbol: "V", name: "volume", operationToFind: "n*R*T/P"},
-        {symbol: "n", name: "amount of substance", operationToFind: "P*V/R*T"}, 
-        {symbol: "R", name: "gas constant", operationToFind: "P*V/n/T"},
-        {symbol: "T", name: "temperature", operationToFind: "P*V/n/R"},
-    ]},
-    {displayName: "Wavelength", category: "physics", subcategory: "waves", description: "-", displayOperation: "b{λ} = b{v} / b{f}",
-    formulaElements: [
-        {symbol: "λ", name: "wavelength", operationToFind: "v/f"},
-        {symbol: "v", name: "velocity", operationToFind: "λ*f"},
-        {symbol: "f", name: "frequency", operationToFind: "v/λ"},
-    ]},
-    {displayName: "Einstein's Mass-Energy Equivalence", category: "physics", subcategory: "relativity", description: "-", displayOperation: "b{E} = b{m} * b{c}^2",
-    formulaElements: [
-        {symbol: "E", name: "energy", operationToFind: "m*c^2"},
-        {symbol: "m", name: "mass", operationToFind: "E/c^2"},
-        {symbol: "c", name: "speed of light", operationToFind: "r(E/m)"},
-    ]},
-    {displayName: "Pythagorean Theorem", category: "mathematics", subcategory: "geometry", description: "-", displayOperation: "b{c} = r(b{a}^2 + b{b}^2)",
-    formulaElements: [
-        {symbol: "c", name: "hypotenuse", operationToFind: "r(a^2 + b^2)"},
-        {symbol: "a", name: "side a", operationToFind: "r(c^2 - b^2)"},
-        {symbol: "b", name: "side b", operationToFind: "r(c^2 - a^2)"},
-    ]}
 ]
