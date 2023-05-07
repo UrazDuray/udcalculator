@@ -48,7 +48,7 @@ function CalculatorOnInput(input, restoreCursorPlace){
         document.getElementById("resultSpan").textContent = calculationResult.errorString
     }
     
-    if(restoreCursorPlace) RestoreCursorPlace()
+    if(restoreCursorPlace) RestoreCursorPlace("CalculatorInputDiv")
     
     //console.log(`Calculated in ${new Date() - startDate}ms`)
     return calculationResult.result
@@ -465,7 +465,7 @@ function ApplyConversion(unit1Data, unit2Data, value){
 function ColorizeInput(input, orderedOperationsAndNumbers){
     input = input.substring(1, input.length-1)
     let indexShift = 0
-    SaveCursorPlace()
+    SaveCursorPlace("CalculatorInputDiv")
 
     let listToColorize = orderedOperationsAndNumbers.concat(unitsToColorize)
     listToColorize.sort(({index:a}, {index:b}) => a-b)
@@ -1135,13 +1135,13 @@ if (window.getSelection && document.createRange) {
 
 var savedSelection = {start: 0, end: 0};
 
-function SaveCursorPlace() {
-    savedSelection = saveSelection( document.getElementById("CalculatorInputDiv") );
+function SaveCursorPlace(divId) {
+    savedSelection = saveSelection( document.getElementById(divId) );
 }
 
-function RestoreCursorPlace() {
+function RestoreCursorPlace(divId) {
     if (savedSelection) {
-        restoreSelection(document.getElementById("CalculatorInputDiv"), savedSelection);
+        restoreSelection(document.getElementById(divId), savedSelection);
     }
 }
 //#endregion
