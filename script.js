@@ -35,7 +35,7 @@ CalculatorInputDivElement.addEventListener('wheel', e => {
 function CalculatorOnInput(input, restoreCursorPlace){
     // Measure calculation speed
     //const startDate = new Date()
-
+    SaveCursorPlace("CalculatorInputDiv")
     lastCalculatorInput = input
     const calculationResult = Calculation(input, true, calculatorCustomVariables)
     document.getElementById("CalculatorInputDiv").innerHTML = calculationResult.htmlColorized
@@ -465,7 +465,6 @@ function ApplyConversion(unit1Data, unit2Data, value){
 function ColorizeInput(input, orderedOperationsAndNumbers){
     input = input.substring(1, input.length-1)
     let indexShift = 0
-    SaveCursorPlace("CalculatorInputDiv")
 
     let listToColorize = orderedOperationsAndNumbers.concat(unitsToColorize)
     listToColorize.sort(({index:a}, {index:b}) => a-b)
@@ -1136,7 +1135,7 @@ if (window.getSelection && document.createRange) {
 var savedSelection = {start: 0, end: 0};
 
 function SaveCursorPlace(divId) {
-    savedSelection = saveSelection( document.getElementById(divId) );
+    savedSelection = saveSelection(document.getElementById(divId));
 }
 
 function RestoreCursorPlace(divId) {

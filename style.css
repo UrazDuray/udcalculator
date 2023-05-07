@@ -33,13 +33,13 @@ body{
 #CalculatorInputDiv{
     outline: none;
     padding: 8px;
+    background-color: var(--dark-calc-input-bc);
     color: var(--dark-font-c);
     border: none;
     border-radius: 10px;
     font-size: 40px;
     white-space: nowrap;
     overflow-x: scroll;
-    background-color: var(--dark-calc-input-bc);
 }
 
 #CalculatorInputDiv::-webkit-scrollbar{
@@ -696,15 +696,18 @@ body{
 
 
 .FunctionsDivClass{
-    display: flex;
     background-color: var(--dark-bc); 
     border-radius: 10px;
     padding: 10px;
-    margin: 10px 0px 0 10px;
-    width: calc(100vw - 40px);
+    margin: 10px 0 0 10px;
+    width: calc(100vw - 160px);
     font-size: 40px;
     height: 80px;
     box-sizing: border-box;
+    outline: none;
+    transition-duration: 150ms;
+    border: transparent solid 4px;
+    white-space: nowrap;
 }
 
 .PlotterDivClass{
