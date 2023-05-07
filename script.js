@@ -160,7 +160,7 @@ function Calculation(input, outputHtmlColorized, customVariables){
         }
     }
 
-    const result = orderedOperations.length == 0 ? input.substring(1, input.length-1) : Calculate(input, [...orderedOperations], [...orderedOperationsAndNumbers])
+    const result = Calculate(input, [...orderedOperations], [...orderedOperationsAndNumbers])
 
     const colorizedInput = outputHtmlColorized ? ColorizeInput(input, [...orderedOperationsAndNumbers], customVariables) : undefined
     
@@ -172,7 +172,7 @@ function Calculation(input, outputHtmlColorized, customVariables){
 function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
     input = input.substring(1, input.length-1) //remove ghost parantheses
     unitsToColorize = []
-    let resultToReturn
+    let resultToReturn = input
     
     for (let i = 0; i < orderedOperations.length; i++) {
         const e = orderedOperations[i]
