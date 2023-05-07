@@ -9,6 +9,7 @@ To do:
 - add hsl to color picker
 - add favorite colors
 - formula için daha kolay bir yol
+- calculation işlem yoksa da result versin
 
 functions:
 - vecrossp problemi

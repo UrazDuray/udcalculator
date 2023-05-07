@@ -22,8 +22,8 @@ if(packageMode){
 
 //CalculatorInputDivElement.textContent = "<1,-2,3>crossp<1,5,7>"
 
-let customVariableId = 0
-let customVariables = [
+let calculatorCustomVariableId = 0
+let calculatorCustomVariables = [
     //{symbol: "x", value: 5, color: "#3f6ad9", id: 0}
 ]
 
@@ -37,7 +37,7 @@ function CalculatorOnInput(input, restoreCursorPlace){
     //const startDate = new Date()
 
     lastCalculatorInput = input
-    const calculationResult = Calculation(input, true)
+    const calculationResult = Calculation(input, true, calculatorCustomVariables)
     document.getElementById("CalculatorInputDiv").innerHTML = calculationResult.htmlColorized
     if(!calculationResult.incorrectInput){
         document.getElementById("resultSpan").style.color = initialInputColor
@@ -55,7 +55,7 @@ function CalculatorOnInput(input, restoreCursorPlace){
 }
 
 let currentErrorString
-function Calculation(input, outputHtmlColorized){
+function Calculation(input, outputHtmlColorized, customVariables){
     incorrectInput = false
     input = "(" + input + ")"
 
@@ -72,7 +72,7 @@ function Calculation(input, outputHtmlColorized){
     // Find orderedOperations
     orderedByParantheseArray.forEach(e => {
        const insideParanthese = input.slice(e[0]+1, e[1])
-       const operationsFound = FindOperations(insideParanthese, e[0]+1)
+       const operationsFound = FindOperations(insideParanthese, e[0]+1, customVariables)
        if(operationsFound == undefined) { return }
 
        operationsFound.forEach(e => {
@@ -162,11 +162,11 @@ function Calculation(input, outputHtmlColorized){
 
     const result = Calculate(input, [...orderedOperations], [...orderedOperationsAndNumbers])
 
-    const colorizedInput = outputHtmlColorized ? ColorizeInput(input, [...orderedOperationsAndNumbers]) : undefined
+    const colorizedInput = outputHtmlColorized ? ColorizeInput(input, [...orderedOperationsAndNumbers], customVariables) : undefined
     
     // Measure calculation speed
     //console.log(`Calculated in ${new Date() - startDate}ms`)
-    return {result: result, htmlColorized: colorizedInput, incorrectInput: incorrectInput, errorString: currentErrorString}
+    return {result: result, htmlColorized: colorizedInput, incorrectInput: incorrectInput, errorString: currentErrorString, calculateParameters: [input, orderedOperations, orderedOperationsAndNumbers]}
 }
 
 function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
@@ -475,7 +475,7 @@ function ColorizeInput(input, orderedOperationsAndNumbers){
         if(e.negativeNumber) continue
 
         const elementData = operationsData.find(x => x.operation == e.operation) || specialNumbersData.find(x => x.specialNumber == e.specialNumber)
-         || unitsData.find(x => x.unit == e.unit) || customVariables.find(x => x.symbol == e.symbol)
+         || unitsData.find(x => x.unit == e.unit) || calculatorCustomVariables.find(x => x.symbol == e.symbol)
         
         if(e != undefined && elementData != undefined){
             const oldString = e.symbol
@@ -494,7 +494,7 @@ function ColorizeInput(input, orderedOperationsAndNumbers){
     return input
 }
 
-function FindOperations(input, indexShift){
+function FindOperations(input, indexShift, customVariables){
     if(input.length == 0){ return }
     let orderedOperations = []
     
@@ -1151,12 +1151,12 @@ const CustomVariablesListDivElement = document.getElementById("CustomVariablesLi
 
 function AddCustomVariable(){
     CustomVariablesListDivElement.innerHTML += `
-        <div id="CustomVariableDiv${customVariableId}" class="CustomVaraibleDivClass CustomVaraibleDivStartAnimClass">
-            <div spellcheck="false" contenteditable="true" oninput="CustomVariableOnInput(this.id, this.textContent)" id="CustomVaraibleSymbolInput${customVariableId}" class="CustomVariableInputClass" type="text"></div>
+        <div id="CustomVariableDiv${calculatorCustomVariableId}" class="CustomVaraibleDivClass CustomVaraibleDivStartAnimClass">
+            <div spellcheck="false" contenteditable="true" oninput="CustomVariableOnInput(this.id, this.textContent)" id="CustomVaraibleSymbolInput${calculatorCustomVariableId}" class="CustomVariableInputClass" type="text"></div>
             <span class="CustomVariableSpanClass">&nbsp=&nbsp</span>
-            <div spellcheck="false" contenteditable="true" oninput="CustomVariableOnInput(this.id, this.textContent)" id="CustomVaraibleValueInput${customVariableId}" class="CustomVariableInputClass" type="text"></div>
-            <button onclick="RemoveCustomVariable(${customVariableId})" class="CustomVariableDeleteButtonClass"></button>
-            <div id="CustomVariableErrorDiv${customVariableId}" class="CustomVariableErrorDivClass"></div>
+            <div spellcheck="false" contenteditable="true" oninput="CustomVariableOnInput(this.id, this.textContent)" id="CustomVaraibleValueInput${calculatorCustomVariableId}" class="CustomVariableInputClass" type="text"></div>
+            <button onclick="RemoveCustomVariable(${calculatorCustomVariableId})" class="CustomVariableDeleteButtonClass"></button>
+            <div id="CustomVariableErrorDiv${calculatorCustomVariableId}" class="CustomVariableErrorDivClass"></div>
         </div>`
     
     const beforeLastElement = CustomVariablesListDivElement.children[CustomVariablesListDivElement.children.length-2]
@@ -1164,8 +1164,8 @@ function AddCustomVariable(){
         beforeLastElement.classList.remove("CustomVaraibleDivStartAnimClass")
     }
 
-    customVariables.push({symbol: undefined, value: undefined, color: "#3f6ad9", id: customVariableId})
-    customVariableId++
+    calculatorCustomVariables.push({symbol: undefined, value: undefined, color: "#3f6ad9", id: calculatorCustomVariableId})
+    calculatorCustomVariableId++
 }
 
 function EditLastCustomVariable(symbol, value){
@@ -1181,7 +1181,7 @@ function EditLastCustomVariable(symbol, value){
 
 function CustomVariableOnInput(id){
     realId = id.substring(id.indexOf("Input") + 5)
-    let customVariableData = customVariables.find(x => x.id == realId)
+    let customVariableData = calculatorCustomVariables.find(x => x.id == realId)
     
     const symbol = document.getElementById("CustomVaraibleSymbolInput" + realId).textContent
     const value = document.getElementById("CustomVaraibleValueInput" + realId).textContent
@@ -1191,8 +1191,8 @@ function CustomVariableOnInput(id){
     if(symbol.includes(placeHolderChar)){ ThrowErrorCodeForVariables(`Variable name can't contain '${placeHolderChar}' character`, realId);  return}
     if(symbol.includes("<") || symbol.includes(">")){ ThrowErrorCodeForVariables(`Variable name can't contain '<' or '>' characters`, realId);  return}
     //check if same variable name exists
-    for (let i = 0; i < customVariables.length; i++) {
-        const e = customVariables[i];
+    for (let i = 0; i < calculatorCustomVariables.length; i++) {
+        const e = calculatorCustomVariables[i];
         if(e.symbol == symbol && e.id != realId){
             ThrowErrorCodeForVariables("This variable name already exists", realId)
             return
@@ -1236,7 +1236,7 @@ function CustomVariableOnInput(id){
 
 function RemoveCustomVariable(id){
     document.getElementById("CustomVariableDiv" + id).classList.add("CustomVaraibleDivRemoveAnimClass")
-    customVariables.splice(customVariables.indexOf(customVariables.find(x => x.id == id)), 1)
+    calculatorCustomVariables.splice(calculatorCustomVariables.indexOf(calculatorCustomVariables.find(x => x.id == id)), 1)
     setTimeout(() => {
         document.getElementById("CustomVariableDiv" + id).remove()
     }, 200);

@@ -23,7 +23,7 @@ function resizePlotterCanvas(){
 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 
-function plot(){
+function plot(calculateParameters){
     plotterCtx.clearRect(0,0,plotterCanvasElement.width,plotterCanvasElement.height)
     plotterCtx.save()
     
@@ -47,7 +47,7 @@ function plot(){
     console.log("Çizilen nokta miktarı: " + ((plotterCanvasElement.width)*(1/zoom)/resolution))
 
     for(x=plotterCanvasElement.width/2*(1/zoom)*-1;x<plotterCanvasElement.width/2*(1/zoom)+ 5;x+=resolution){
-        plotterCtx.lineTo(x,PlotFunction(x-xToScroll),1,0,Math.PI*2)
+        plotterCtx.lineTo(x,PlotFunction(x-xToScroll, calculateParameters),1,0,Math.PI*2)
     }
 
     plotterCtx.stroke()
@@ -90,19 +90,34 @@ function FunctionNameChanged(name){
 
 }
 
-function PlotFunction(x){
+//plotter variables
+let plotterCustomVariables = [
+    {symbol: "x", value: 0, color: "#3f6ad9", id: 0}
+]
+
+function PlotFunction(x, calculateParameters){
 
     operation = document.getElementById("FunctionsDiv").textContent;
-    
-if(operation){
-    operation = operation.replaceAll("x",x)
-    console.log(operation);
-    var result = Calculation(operation);
-    console.log(result)
-    return result
-}else{
-    return 0
-}
+        
+    if(operation){
+        for (let i = 0; i < calculateParameters[2].length; i++) {
+            const e = calculateParameters[2][i];
+
+            //!not custom variableları değiştir
+            //ilerde farklı custom variableları farklı değerler atamalı şekilde yapmalı
+            if(e.customVariable){
+                e.number = x
+            }
+        }
+
+        //console.log(operation);
+        var result = Calculate(...JSON.parse(JSON.stringify(calculateParameters)))
+
+        console.log(result)
+        return result
+    }else{
+        return 0
+    }
 
 
 }
@@ -110,15 +125,14 @@ if(operation){
 //const  mathregex = new RegExp("[a-z](?=.*\(.*?\))","gim")
 const  mathregex = new RegExp("([a-z]){3,}","gi")
 
-
 function FunctionChanged(func){
 
     SaveCursorPlace("FunctionsDiv")
-    const calculationResult = Calculation([func], true)
+    const calculationResult = Calculation([func], true, plotterCustomVariables)
     document.getElementById("FunctionsDiv").innerHTML = calculationResult.htmlColorized
 
     RestoreCursorPlace("FunctionsDiv")
-    plot()
+    plot(calculationResult.calculateParameters)
 
 /* 
 formating will be adapted from the main calclator
