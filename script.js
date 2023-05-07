@@ -160,7 +160,7 @@ function Calculation(input, outputHtmlColorized, customVariables){
         }
     }
 
-    const result = Calculate(input, [...orderedOperations], [...orderedOperationsAndNumbers])
+    const result = orderedOperations.length == 0 ? input.substring(1, input.length-1) : Calculate(input, [...orderedOperations], [...orderedOperationsAndNumbers])
 
     const colorizedInput = outputHtmlColorized ? ColorizeInput(input, [...orderedOperationsAndNumbers], customVariables) : undefined
     
