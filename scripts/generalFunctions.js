@@ -73,3 +73,21 @@ function FirstLetterUpperCase(text){
     return text[0].toUpperCase() + text.substring(1)
 }
 
+let chronometers = {
+    //plot: 3
+}
+
+function Chronometer(id){
+    if(chronometers[id] == undefined){
+        //start chronometer
+        chronometers[id] = new Date()
+    }
+    else{
+        //finish chronometer
+        const currentDate = chronometers[id]
+        console.log(`Calculated in ${new Date() - currentDate}ms`)
+        delete chronometers[id]
+    }
+    
+}
+

@@ -329,6 +329,7 @@ function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
         vectorString += resultToReturn[resultToReturn.length-1] + ">"
         return vectorString
     }
+    
     return resultToReturn
 }
 
