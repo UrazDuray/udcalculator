@@ -1,4 +1,4 @@
-let unitsToColorize = []
+let currentUnitsToColorize = []
 const resultSpanElement = document.getElementById("resultSpan")
 const additionalMenusElement = document.getElementById("AdditionalMenusDiv")
 let initialInputColor = resultSpanElement.style.color
@@ -14,6 +14,13 @@ const argSplitter = ','
 const packageMode = false
 let testAllOnStart = true
 let debugTurnOffCurrencyApi = true
+
+// DATA
+//InitializeData()
+
+//temp
+const trigoRoundDecimal = 15
+
 
 if(packageMode){
     testAllOnStart = false
@@ -38,24 +45,27 @@ function CalculatorOnInput(input, restoreCursorPlace){
     SaveCursorPlace("CalculatorInputDiv")
     lastCalculatorInput = input
     const calculationResult = Calculation(input, true, calculatorCustomVariables)
-    document.getElementById("CalculatorInputDiv").innerHTML = calculationResult.htmlColorized
-    if(!calculationResult.incorrectInput){
+    
+    const undefinedResult = calculationResult == undefined ? true : false
+    if(!undefinedResult && calculationResult.incorrectInput == false){
+        document.getElementById("CalculatorInputDiv").innerHTML = calculationResult.htmlColorized
         document.getElementById("resultSpan").style.color = initialInputColor
         document.getElementById("resultSpan").textContent = calculationResult.result
     }
     else{
         document.getElementById("resultSpan").style.color = "red"
-        document.getElementById("resultSpan").textContent = calculationResult.errorString
+        document.getElementById("resultSpan").textContent = undefinedResult ? currentErrorString : calculationResult.errorString
     }
     
     if(restoreCursorPlace) RestoreCursorPlace("CalculatorInputDiv")
     
     //console.log(`Calculated in ${new Date() - startDate}ms`)
-    return calculationResult.result
+    return undefinedResult ? false : calculationResult.result
 }
 
 let currentErrorString
 function Calculation(input, outputHtmlColorized, customVariables){
+    //Chronometer("main-calculator")
     incorrectInput = false
     input = "(" + input + ")"
 
@@ -66,8 +76,8 @@ function Calculation(input, outputHtmlColorized, customVariables){
     
     //find vectors
     const findVectorsOutput = FindVectors(input)
-    let vectorsOrdered = findVectorsOutput[0]
-    let indexesToIgnoreByArgSplitter = findVectorsOutput[1]
+    if(findVectorsOutput == undefined) { ThrowErrorCode("Incorrect use of vectors"); return }
+    let [vectorsOrdered, indexesToIgnoreByArgSplitter] = findVectorsOutput
     
     // Find orderedOperations
     orderedByParantheseArray.forEach(e => {
@@ -164,14 +174,13 @@ function Calculation(input, outputHtmlColorized, customVariables){
 
     const colorizedInput = outputHtmlColorized ? ColorizeInput(input, [...orderedOperationsAndNumbers], customVariables) : undefined
     
-    // Measure calculation speed
-    //console.log(`Calculated in ${new Date() - startDate}ms`)
+    //Chronometer("main-calculator")
     return {result: result, htmlColorized: colorizedInput, incorrectInput: incorrectInput, errorString: currentErrorString, calculateParameters: [input, orderedOperations, orderedOperationsAndNumbers]}
 }
 
 function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
     input = input.substring(1, input.length-1) //remove ghost parantheses
-    unitsToColorize = []
+    currentUnitsToColorize = []
     let resultToReturn = input
     
     for (let i = 0; i < orderedOperations.length; i++) {
@@ -219,7 +228,7 @@ function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
             }
             else if(num2Element.operation == "substract" && num2Element.negativeNumber){
                 const num3Element = orderedOperationsAndNumbers[currentOperationIndex + 2]
-                if(num3Element == undefined){ ThrowErrorCode("Missing Number"); return }
+                if(num3Element == undefined){ ThrowErrorCode("Missing number"); return }
                 
                 num2Element.number = -num3Element.number
                 removeMoreElementCount = 1
@@ -301,8 +310,8 @@ function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
 
                 if(unit1Data == undefined || unit2Data == undefined){ ThrowErrorCode("Incorrect unit"); return}
 
-                unitsToColorize.push({unit: unit1Data.unit, symbol: unit1Symbol, index: unit1StartIndex})
-                unitsToColorize.push({unit: unit2Data.unit, symbol: unit2Symbol, index: unit2StartIndex})
+                currentUnitsToColorize.push({unit: unit1Data.unit, symbol: unit1Symbol, index: unit1StartIndex})
+                currentUnitsToColorize.push({unit: unit2Data.unit, symbol: unit2Symbol, index: unit2StartIndex})
                 
                 const result = ApplyConversion(unit1Data, unit2Data, prevElement.number)
                 orderedOperationsAndNumbers.splice(currentOperationIndex-1, 2, {number: result, index: currentOperationIndex - 1})
@@ -335,95 +344,103 @@ function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
 
 function ApplyOperation(operation, nums, vectorMode){
     const operationData = GetOperationData(operation)
-    
+
+    let rounding
     if(operationData.category == "trigo"){
         nums[0] = DegreeToRadian(nums[0])
+        rounding = trigoRoundDecimal
     }
+
+    const result = (function (){
+        switch (operation.operation) {
+            //basic ops
+            case "sum":
+                return SumOperation(nums[0], nums[1], vectorMode)
+            case "substract":
+                return SubstractOperation(nums[0], nums[1], vectorMode)
+            case "divide":
+                return DivideOperation(nums[0], nums[1], vectorMode)
+            case "multiply":
+                return MultiplyOperation(nums[0], nums[1], vectorMode)
+            case "percentage":
+                return nums[0] / 100
+            case "power":
+                return nums[0]**nums[1]
+            case "root":
+                return nums[1]**(1/nums[0])
+            case "logarithm":
+                return Math.log(nums[1]) / Math.log(nums[0])
+            case "ln":
+                return Math.log(nums[0]) / Math.log(Math.E)
+            case "factorial":
+                return Factorial(nums[0])
+            
+            //conversion
+            case "degree":
+                return (nums[0] * 180) / Math.PI
+            case "radian":
+                return (nums[0] * Math.PI) / 180
+            case "primeCheck":
+                return IsPrime(nums[0])
     
-    switch (operation.operation) {
-        //basic ops
-        case "sum":
-            return SumOperation(nums[0], nums[1], vectorMode)
-        case "substract":
-            return SubstractOperation(nums[0], nums[1], vectorMode)
-        case "divide":
-            return DivideOperation(nums[0], nums[1], vectorMode)
-        case "multiply":
-            return MultiplyOperation(nums[0], nums[1], vectorMode)
-        case "percentage":
-            return nums[0] / 100
-        case "power":
-            return nums[0]**nums[1]
-        case "root":
-            return nums[1]**(1/nums[0])
-        case "logarithm":
-            return Math.log(nums[1]) / Math.log(nums[0])
-        case "ln":
-            return Math.log(nums[0]) / Math.log(Math.E)
-        case "factorial":
-            return Factorial(nums[0])
-        
-        //conversion
-        case "degree":
-            return (nums[0] * 180) / Math.PI
-        case "radian":
-            return (nums[0] * Math.PI) / 180
-        case "primeCheck":
-            return IsPrime(nums[0])
+                //TRIGONOMETRIC
+            //normal
+            case "cos":
+                return Math.cos(nums[0])
+            case "sin":
+                return Math.sin(nums[0])
+            case "tan":
+                return Math.tan(nums[0])
+            case "cot":
+                return 1 / Math.tan(nums[0])
+            case "sec":
+                return 1 / Math.cos(nums[0])
+            case "cosec":
+                return 1 / Math.sin(nums[0])
+    
+            //arc
+            case "arccos":
+                return RadianToDegree(Math.acos(nums[0]))
+            case "arcsin":
+                return RadianToDegree(Math.asin(nums[0]))
+            case "arctan":
+                return RadianToDegree(Math.atan(nums[0]))
+            case "arccot":
+                return RadianToDegree(1 / Math.atan(nums[0]))
+            case "arcsec":
+                return RadianToDegree(1 / Math.acos(nums[0]))
+            case "arccosec":
+                return RadianToDegree(1 / Math.asin(nums[0]))
+            
+            //vectors
+            case "crossProduct":
+                return CrossProduct(nums[0], nums[1])
+            case "dotProduct":
+                return DotProduct(nums[0], nums[1])
+            case "magnitudeOfVector":
+                return MagnitudeOfVector(nums[0])
+            case "unitVectorOfVector":
+                return UnitVectorOfVector(nums[0])
+            case "angleBetweenTwoVectors":
+                return AngleBetweenTwoVectors(nums[0], nums[1])
+            case "vectorProjection":
+                return ProjectVectorOnVector(nums[0], nums[1])
+            
+            //functions
+            case "convertToVector":
+                return FunctionToVectorConversion(nums)
+            case "sumOfRange":
+                return SumOfRangeFunction(nums[0], nums[1])
+            case "randomOfRange":
+                return RandomOfRangeFunction(nums[0], nums[1])
+            default:
+                return undefined
+        }
+    }) ()
 
-            //TRIGONOMETRIC
-        //normal
-        case "cos":
-            return Math.cos(nums[0])
-        case "sin":
-            return Math.sin(nums[0])
-        case "tan":
-            return Math.tan(nums[0])
-        case "cot":
-            return 1 / Math.tan(nums[0])
-        case "sec":
-            return 1 / Math.cos(nums[0])
-        case "cosec":
-            return 1 / Math.sin(nums[0])
-
-        //arc
-        case "arccos":
-            return RadianToDegree(Math.acos(nums[0]))
-        case "arcsin":
-            return RadianToDegree(Math.asin(nums[0]))
-        case "arctan":
-            return RadianToDegree(Math.atan(nums[0]))
-        case "arccot":
-            return RadianToDegree(1 / Math.atan(nums[0]))
-        case "arcsec":
-            return RadianToDegree(1 / Math.acos(nums[0]))
-        case "arccosec":
-            return RadianToDegree(1 / Math.asin(nums[0]))
-        
-        //vectors
-        case "crossProduct":
-            return CrossProduct(nums[0], nums[1])
-        case "dotProduct":
-            return DotProduct(nums[0], nums[1])
-        case "magnitudeOfVector":
-            return MagnitudeOfVector(nums[0])
-        case "unitVectorOfVector":
-            return UnitVectorOfVector(nums[0])
-        case "angleBetweenTwoVectors":
-            return AngleBetweenTwoVectors(nums[0], nums[1])
-        case "vectorProjection":
-            return ProjectVectorOnVector(nums[0], nums[1])
-        
-        //functions
-        case "convertToVector":
-            return FunctionToVectorConversion(nums)
-        case "sumOfRange":
-            return SumOfRangeFunction(nums[0], nums[1])
-        case "randomOfRange":
-            return RandomOfRangeFunction(nums[0], nums[1])
-        default:
-            return undefined
-    }
+    if(rounding != undefined) return +result.toFixed(rounding)
+    
+    return result
 }
 
 function ApplyConversion(unit1Data, unit2Data, value){
@@ -467,7 +484,7 @@ function ColorizeInput(input, orderedOperationsAndNumbers){
     input = input.substring(1, input.length-1)
     let indexShift = 0
 
-    let listToColorize = orderedOperationsAndNumbers.concat(unitsToColorize)
+    let listToColorize = orderedOperationsAndNumbers.concat(currentUnitsToColorize)
     listToColorize.sort(({index:a}, {index:b}) => a-b)
 
     for (let i = 0; i < listToColorize.length; i++) {
@@ -628,12 +645,16 @@ function IndexCollisionChecker(limits1, limits2){
     }   
 }
 
-let functionsData = []
-operationsData.forEach( e => {
-    if(e.category == "function"){
-        functionsData.push(e)
-    }
-})
+const functionsData = (function (){
+    let temp_functionsData = []
+    operationsData.forEach( e => {
+        if(e.category == "function"){
+            temp_functionsData.push(e)
+        }
+    })
+    return temp_functionsData
+})()
+
 
 // function EditInputForFunctions(input){
 //     let functionsFound = []
@@ -897,10 +918,10 @@ function ColoredTextGenerator(text){
     return text
 }
 
-function ThrowErrorCode(errorString){
+function ThrowErrorCode(errorString, traceError){
     incorrectInput = true
     currentErrorString = errorString
-    //console.trace(errorString)
+    if(traceError) console.trace(errorString)
 }
 
 //!not currently not used

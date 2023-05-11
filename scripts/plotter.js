@@ -1,13 +1,13 @@
 const plotterCanvasElement = document.getElementById("plotterCanvas");
 const plotterCtx = plotterCanvasElement.getContext("2d");
 
-const canvasParent = document.getElementsByClassName("PlotterDivClass")[0]
+const plotterCanvasParent = document.getElementsByClassName("PlotterDivClass")[0]
 
-var deltaX = 0;
-var xToScroll = 0
-var canvasX = 0;
-var zoom = 1;
-var resolution = 1;
+var plotterDeltaX = 0;
+var plotterXToScroll = 0
+var plotterCanvasX = 0;
+var plotterZoom = 1;
+var plotterResolution = 1;
 
 let currentCalculateParameters
 plot(currentCalculateParameters)
@@ -17,12 +17,12 @@ window.onresize=resizePlotterCanvas
 resizePlotterCanvas()
 function resizePlotterCanvas(){
     const tempCanvas = plotterCtx.getImageData(0,0,plotterCanvasElement.width,plotterCanvasElement.height)
-    plotterCanvasElement.width=canvasParent.clientWidth
-    plotterCanvasElement.height=canvasParent.clientHeight
+    plotterCanvasElement.width=plotterCanvasParent.clientWidth
+    plotterCanvasElement.height=plotterCanvasParent.clientHeight
     plotterCtx.putImageData(tempCanvas,0,0)
 }
 
-const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+const PlotterClamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 function plot(){
     plotterCtx.clearRect(0,0,plotterCanvasElement.width,plotterCanvasElement.height)
@@ -39,17 +39,17 @@ function plot(){
     plotterCtx.stroke()
 
     plotterCtx.translate(plotterCanvasElement.width/2,plotterCanvasElement.height/2)
-    plotterCtx.scale(zoom,zoom)
+    plotterCtx.scale(plotterZoom,plotterZoom)
     plotterCtx.beginPath();
     plotterCtx.moveTo(plotterCanvasElement.width/2*-1,0)
 
-    resolution = 2/zoom
+    plotterResolution = 2/plotterZoom
 
-    console.log("Çizilen nokta miktarı: " + ((plotterCanvasElement.width)*(1/zoom)/resolution))
+    console.log("Çizilen nokta miktarı: " + ((plotterCanvasElement.width)*(1/plotterZoom)/plotterResolution))
 
     Chronometer("plot")
-    for(x=plotterCanvasElement.width/2*(1/zoom)*-1;x<plotterCanvasElement.width/2*(1/zoom)+ 5;x+=resolution){
-        plotterCtx.lineTo(x,-PlotFunction(x-xToScroll),1,0,Math.PI*2)
+    for(x=plotterCanvasElement.width/2*(1/plotterZoom)*-1;x<plotterCanvasElement.width/2*(1/plotterZoom)+ 5;x+=plotterResolution){
+        plotterCtx.lineTo(x,-PlotFunction(x-plotterXToScroll),1,0,Math.PI*2)
     }
     Chronometer("plot")
 
@@ -58,29 +58,28 @@ function plot(){
 
 }
 
-
-var isScrolling = false;
+var plotterIsScrolling = false;
 
 plotterCanvasElement.addEventListener("wheel",e=>{
-    zoom += e.wheelDeltaY/600
-    zoom = clamp(zoom,0.25,5)
+    plotterZoom += e.wheelDeltaY/600
+    plotterZoom = PlotterClamp(plotterZoom,0.25,5)
     plot()
     //console.log(zoom)
 })
 plotterCanvasElement.addEventListener("mousedown", e=>{
-    isScrolling = true;
-    deltaX = e.clientX;
+    plotterIsScrolling = true;
+    plotterDeltaX = e.clientX;
 })
 plotterCanvasElement.addEventListener("mouseup", e=>{
-    isScrolling = false;
-    deltaX = e.clientX
+    plotterIsScrolling = false;
+    plotterDeltaX = e.clientX
 })
 plotterCanvasElement.addEventListener("mouseleave",e=>{
-    isScrolling=false
+    plotterIsScrolling=false
 })
 plotterCanvasElement.addEventListener("mousemove", e=>{
-    if(isScrolling){
-        xToScroll = e.clientX - deltaX;
+    if(plotterIsScrolling){
+        plotterXToScroll = e.clientX - plotterDeltaX;
         plot()
         //console.log(xToScroll)
     }
@@ -122,7 +121,7 @@ function PlotFunction(x){
 }
 
 //const  mathregex = new RegExp("[a-z](?=.*\(.*?\))","gim")
-const  mathregex = new RegExp("([a-z]){3,}","gi")
+const plotterMathRegex = new RegExp("([a-z]){3,}","gi")
 
 function FunctionChanged(func){
     

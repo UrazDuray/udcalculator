@@ -91,3 +91,22 @@ function Chronometer(id){
     
 }
 
+//#region DATA
+const dataLocalStorageKey = "data"
+function InitializeData(){
+    if(localStorage.getItem(dataLocalStorageKey) == undefined){
+        const settingsData = {
+            rounding: {
+                trigonometric: 17
+            }
+        }
+        SaveData(settingsData)
+    }
+}
+function GetData(){
+    return JSON.parse(localStorage.getItem(dataLocalStorageKey))
+}
+function SaveData(data){
+    localStorage.setItem(dataLocalStorageKey, JSON.stringify(data))
+}
+//#endregion
