@@ -13,19 +13,17 @@ const argSplitter = ','
 // Debug
 const packageMode = false
 let testAllOnStart = true
-let debugTurnOffCurrencyApi = true
+let debugTurnOffCurrencyApi = false
+if(packageMode){
+    testAllOnStart = false
+    debugTurnOffCurrencyApi = false
+}
 
 // DATA
 //InitializeData()
 
 //temp
 const trigoRoundDecimal = 15
-
-
-if(packageMode){
-    testAllOnStart = false
-    debugTurnOffCurrencyApi = false
-}
 
 //CalculatorInputDivElement.textContent = "<1,-2,3>crossp<1,5,7>"
 
@@ -475,7 +473,7 @@ function ApplyConversion(unit1Data, unit2Data, value){
             }
         }
     }
-    else if(["length", "weight", "volume", "time"].includes(unit1DataCategory)){
+    else if(["length", "weight", "volume", "time", "currency"].includes(unit1DataCategory)){
         return value * (unit1Data.equivalentValue / unit2Data.equivalentValue)
     }
 }
@@ -1019,11 +1017,18 @@ function HelpMenuListGenerator(){
 
     HelpMenuElementGenerator(unitsData)
 
+    helpMenuList.innerHTML += '<div class="helpItemClass">\
+                                        <span class="helpItemClassCategoryClass">currency</span>\
+                                        <span class="helpItemClassCategoryClass">currency</span>\
+                                        <span class="helpItemClassCategoryClass">' + ColoredTextGenerator('[#36c1f7]{x}[#dec64e]{eur}to[#dec64e]{usd}')  + '</span>\
+                                        <span class="helpItemClassCategoryClass">You can convert currencies in main calculator too</span>\
+                                    </div>'
 }
 
 function HelpMenuElementGenerator(elementsArray){
     for (let i = 0; i < elementsArray.length; i++) {
         const e = elementsArray[i];
+        if(e.showInHelp == false) continue
         
         let examplesString = ""
         e.examples.forEach(ex => {
@@ -1825,6 +1830,11 @@ async function GetCurrencyData() {
     const jsonData = await response.json();
     currencyValueData = await jsonData
     GenerateCurrencySelectBoxes()
+    for (let i = 0; i < Object.keys(currencyValueData.eur).length; i++) {
+        const key = Object.keys(currencyValueData.eur)[i]
+        const value = 1/currencyValueData.eur[key]
+        unitsData.push({unit: key, symbols: [key], category: "currency", equivalentValue: value, color: "#dec64e", showInHelp: false},)   
+    }
 }
 
 function GenerateCurrencySelectBoxes(){
@@ -2084,8 +2094,9 @@ function DisplayOperationToRichText(displayOperation, formulaIndex) {
             contentToReplace = `<button title="${eData.name}" onclick="FormulaButtonOnClick('${formulaIndex}', '${e.symbol}')" class="formulaButtonClass">${e.symbol}</button>`
         }
         const startIndex = e.index + indexShift
-        displayOperation = displayOperation.substring(0, startIndex) + contentToReplace + displayOperation.substring(startIndex + e.mode.length + 3)
-        indexShift += contentToReplace.length - e.mode.length - 3
+        displayOperation = displayOperation.substring(0, startIndex) + contentToReplace + displayOperation.substring(startIndex + e.mode.length + e.symbol.length + 2)
+        indexShift += contentToReplace.length - (e.mode.length + e.symbol.length + 2)
+        
     }
     return displayOperation
 }

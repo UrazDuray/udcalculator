@@ -1,7 +1,6 @@
 To do:
 - ctrl + z düzgün çalışmıyo kendi historyni yap
 - horizontal scroll düzelt
-- add currency conversion to main calculator
 - calculations history
 - notification sağ alttan gelsin
 - notification yandan gözüküyor bug düzelt
@@ -17,3 +16,5 @@ functions:
 
 Added:
 - add formulas
+- add currency conversion to main calculator
+- add error % formula

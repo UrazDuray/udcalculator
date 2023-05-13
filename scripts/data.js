@@ -44,7 +44,7 @@ const operationsData = [
     {operation: "logarithm", symbols: ["log"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}log[#f73636]{y}","log[#f73636]{y}"], color: "#6dfc74", description: "x is base, y is argument. If there is no x it will be assumed as 10", priority: 6, vectorCountNeededForOperation: [0]},
     {operation: "ln", symbols: ["ln"], operationApplianceType: "numberOnRight", examples: ["ln[#f73636]{y}"], color: "#6dfc74", description: "Log with base as e", priority: 5, vectorCountNeededForOperation: [0]},
     {operation: "power", symbols: ["^"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}^[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 4, vectorCountNeededForOperation: [0]},
-    {operation: "root", symbols: ["r", "ro", "root"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}root[#f73636]{y}", "[#36c1f7]{x}r[#f73636]{y}", "r[#f73636]{y}"], color: "#6dfc74", description: "x is index of root. If there is no x it will be assumed as 2", priority: 3, vectorCountNeededForOperation: [0]},
+    {operation: "root", symbols: ["R","ro", "root"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}root[#f73636]{y}", "[#36c1f7]{x}r[#f73636]{y}", "r[#f73636]{y}"], color: "#6dfc74", description: "x is index of root. If there is no x it will be assumed as 2", priority: 3, vectorCountNeededForOperation: [0]},
     {operation: "percentage", symbols: ["%"], operationApplianceType: "numberOnLeft", examples: ["[#36c1f7]{x}%"], color: "#36c1f7", description: "divides number by 100", priority: 2, vectorCountNeededForOperation: [0]},
     {operation: "multiply", symbols: ["*"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}*[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 2, vectorCountNeededForOperation: [0, 1]},
     {operation: "divide", symbols: ["/"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}/[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 2, vectorCountNeededForOperation: [0, 1]},
@@ -60,58 +60,68 @@ const specialNumbersData = [
 ]
 
 // 4 significant figures for weird numbers in equivalentValue
-const unitsData = [
-    {unit: "celcius", symbols: ["c", "C"], category: "temperature", color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{c}[#6dfc74]{to}[#dec64e]{k}"], description: "-"},
-    {unit: "fahrenheit", symbols: ["f", "F"], category: "temperature", color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{f}[#6dfc74]{to}[#dec64e]{k}"], description: "-"},
-    {unit: "kelvin", symbols: ["k", "K"], category: "temperature", color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{k}[#6dfc74]{to}[#dec64e]{c}"], description: "-"},
+let unitsData = [
+    {unit: "celcius", symbols: ["c", "C"], category: "temperature", color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{c}to[#dec64e]{k}"], description: "-"},
+    {unit: "fahrenheit", symbols: ["f", "F"], category: "temperature", color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{f}to[#dec64e]{k}"], description: "-"},
+    {unit: "kelvin", symbols: ["k", "K"], category: "temperature", color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{k}to[#dec64e]{c}"], description: "-"},
 
     //length
         //metric
-    {unit: "kilometer", symbols: ["km"], category: "length", equivalentValue: 1000, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{km}[#6dfc74]{to}[#dec64e]{m}"], description: "-"},
-    {unit: "hectometer", symbols: ["hm"], category: "length", equivalentValue: 100, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hm}[#6dfc74]{to}[#dec64e]{m}"], description: "-"},
-    {unit: "decameter", symbols: ["decam"], category: "length", equivalentValue: 10, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{decam}[#6dfc74]{to}[#dec64e]{m}"], description: "-"},
-    {unit: "meter", symbols: ["m"], category: "length", equivalentValue: 1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{km}[#6dfc74]{to}[#dec64e]{m}"], description: "-"},
-    {unit: "decimeter", symbols: ["decim"], category: "length", equivalentValue: 0.1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{decim}[#6dfc74]{to}[#dec64e]{m}"], description: "-"},
-    {unit: "centimeter", symbols: ["cm"], category: "length", equivalentValue: 0.01, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{cm}[#6dfc74]{to}[#dec64e]{m}"], description: "-"},
-    {unit: "millimeter", symbols: ["mm"], category: "length", equivalentValue: 0.001, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{mm}[#6dfc74]{to}[#dec64e]{m}"], description: "-"},
+    {unit: "kilometer", symbols: ["km"], category: "length", equivalentValue: 1000, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{km}to[#dec64e]{m}"], description: "-"},
+    {unit: "hectometer", symbols: ["hm"], category: "length", equivalentValue: 100, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hm}to[#dec64e]{m}"], description: "-"},
+    {unit: "decameter", symbols: ["decam"], category: "length", equivalentValue: 10, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{decam}to[#dec64e]{m}"], description: "-"},
+    {unit: "meter", symbols: ["m"], category: "length", equivalentValue: 1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{km}to[#dec64e]{m}"], description: "-"},
+    {unit: "decimeter", symbols: ["decim"], category: "length", equivalentValue: 0.1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{decim}to[#dec64e]{m}"], description: "-"},
+    {unit: "centimeter", symbols: ["cm"], category: "length", equivalentValue: 0.01, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{cm}to[#dec64e]{m}"], description: "-"},
+    {unit: "millimeter", symbols: ["mm"], category: "length", equivalentValue: 0.001, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{mm}to[#dec64e]{m}"], description: "-"},
         //imperial
-    {unit: "feet", symbols: ["feet"], category: "length", equivalentValue: 0.3048, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{feet}[#6dfc74]{to}[#dec64e]{m}"], description: "-"},
-    {unit: "inch", symbols: ["inch"], category: "length", equivalentValue: 0.0254, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{inch}[#6dfc74]{to}[#dec64e]{m}"], description: "-"},
-    {unit: "mile", symbols: ["mile"], category: "length", equivalentValue: 1609.344, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{mile}[#6dfc74]{to}[#dec64e]{m}"], description: "-"},
+    {unit: "feet", symbols: ["feet"], category: "length", equivalentValue: 0.3048, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{feet}to[#dec64e]{m}"], description: "-"},
+    {unit: "inch", symbols: ["inch"], category: "length", equivalentValue: 0.0254, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{inch}to[#dec64e]{m}"], description: "-"},
+    {unit: "mile", symbols: ["mile"], category: "length", equivalentValue: 1609.344, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{mile}to[#dec64e]{m}"], description: "-"},
     
 
     //weight
         //metric
-    {unit: "kilogram", symbols: ["kg"], category: "weight", equivalentValue: 1000, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{kg}[#6dfc74]{to}[#dec64e]{g}"], description: "-"},
-    {unit: "hectogram", symbols: ["hg"], category: "weight", equivalentValue: 100, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hm}[#6dfc74]{to}[#dec64e]{g}"], description: "-"},
-    {unit: "decagram", symbols: ["decag"], category: "weight", equivalentValue: 10, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{decam}[#6dfc74]{to}[#dec64e]{g}"], description: "-"},
-    {unit: "gram", symbols: ["g"], category: "weight", equivalentValue: 1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{g}[#6dfc74]{to}[#dec64e]{kg}"], description: "-"},
-    {unit: "decigram", symbols: ["decig"], category: "weight", equivalentValue: 0.1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{decim}[#6dfc74]{to}[#dec64e]{g}"], description: "-"},
-    {unit: "centigram", symbols: ["cg"], category: "weight", equivalentValue: 0.01, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{cg}[#6dfc74]{to}[#dec64e]{g}"], description: "-"},
-    {unit: "milligram", symbols: ["mg"], category: "weight", equivalentValue: 0.001, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{mg}[#6dfc74]{to}[#dec64e]{g}"], description: "-"},
+    {unit: "kilogram", symbols: ["kg"], category: "weight", equivalentValue: 1000, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{kg}to[#dec64e]{g}"], description: "-"},
+    {unit: "hectogram", symbols: ["hg"], category: "weight", equivalentValue: 100, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hm}to[#dec64e]{g}"], description: "-"},
+    {unit: "decagram", symbols: ["decag"], category: "weight", equivalentValue: 10, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{decam}to[#dec64e]{g}"], description: "-"},
+    {unit: "gram", symbols: ["g"], category: "weight", equivalentValue: 1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{g}to[#dec64e]{kg}"], description: "-"},
+    {unit: "decigram", symbols: ["decig"], category: "weight", equivalentValue: 0.1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{decim}to[#dec64e]{g}"], description: "-"},
+    {unit: "centigram", symbols: ["cg"], category: "weight", equivalentValue: 0.01, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{cg}to[#dec64e]{g}"], description: "-"},
+    {unit: "milligram", symbols: ["mg"], category: "weight", equivalentValue: 0.001, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{mg}to[#dec64e]{g}"], description: "-"},
         //imperaial
-    {unit: "pound", symbols: ["lbs"], category: "weight", equivalentValue: 453.5, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{lbs}[#6dfc74]{to}[#dec64e]{g}"], description: "-"},
+    {unit: "pound", symbols: ["lbs"], category: "weight", equivalentValue: 453.5, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{lbs}to[#dec64e]{g}"], description: "-"},
 
     //volume
         //metric
-    {unit: "ton", symbols: ["kl", "ton"], category: "volume", equivalentValue: 1000, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{ton}[#6dfc74]{to}[#dec64e]{l}"], description: "-"},
-    {unit: "hectoliter", symbols: ["hl"], category: "volume", equivalentValue: 100, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hl}[#6dfc74]{to}[#dec64e]{l}"], description: "-"},
-    {unit: "decaliter", symbols: ["decal"], category: "volume", equivalentValue: 10, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{decal}[#6dfc74]{to}[#dec64e]{l}"], description: "-"},
-    {unit: "liter", symbols: ["l", "L"], category: "volume", equivalentValue: 1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{l}[#6dfc74]{to}[#dec64e]{ton}"], description: "-"},
-    {unit: "deciliter", symbols: ["decil"], category: "volume", equivalentValue: 0.1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{decil}[#6dfc74]{to}[#dec64e]{l}"], description: "-"},
-    {unit: "centiliter", symbols: ["cl"], category: "volume", equivalentValue: 0.01, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{cl}[#6dfc74]{to}[#dec64e]{l}"], description: "-"},
-    {unit: "milliliter", symbols: ["ml"], category: "volume", equivalentValue: 0.001, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{ml}[#6dfc74]{to}[#dec64e]{l}"], description: "-"},
+    {unit: "ton", symbols: ["kl", "ton"], category: "volume", equivalentValue: 1000, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{ton}to[#dec64e]{l}"], description: "-"},
+    {unit: "hectoliter", symbols: ["hl"], category: "volume", equivalentValue: 100, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hl}to[#dec64e]{l}"], description: "-"},
+    {unit: "decaliter", symbols: ["decal"], category: "volume", equivalentValue: 10, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{decal}to[#dec64e]{l}"], description: "-"},
+    {unit: "liter", symbols: ["l", "L"], category: "volume", equivalentValue: 1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{l}to[#dec64e]{ton}"], description: "-"},
+    {unit: "deciliter", symbols: ["decil"], category: "volume", equivalentValue: 0.1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{decil}to[#dec64e]{l}"], description: "-"},
+    {unit: "centiliter", symbols: ["cl"], category: "volume", equivalentValue: 0.01, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{cl}to[#dec64e]{l}"], description: "-"},
+    {unit: "milliliter", symbols: ["ml"], category: "volume", equivalentValue: 0.001, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{ml}to[#dec64e]{l}"], description: "-"},
         //imperial
-    {unit: "oz", symbols: ["oz"], category: "volume", equivalentValue: 0.02957, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{oz}[#6dfc74]{to}[#dec64e]{l}"], description: "-"},
-    {unit: "gallon", symbols: ["gal", "gallon"], category: "volume", equivalentValue: 3.785, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{gal}[#6dfc74]{to}[#dec64e]{l}"], description: "-"},
+    {unit: "oz", symbols: ["oz"], category: "volume", equivalentValue: 0.02957, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{oz}to[#dec64e]{l}"], description: "-"},
+    {unit: "gallon", symbols: ["gal", "gallon"], category: "volume", equivalentValue: 3.785, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{gal}to[#dec64e]{l}"], description: "-"},
 
     //time
-    {unit: "hour", symbols: ["h"], category: "time", equivalentValue: 3600, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hour}[#6dfc74]{to}[#dec64e]{s}"], description: "-"},
-    {unit: "minute", symbols: ["min", "minute"], category: "time", equivalentValue: 60, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hour}[#6dfc74]{to}[#dec64e]{s}"], description: "-"},
-    {unit: "second", symbols: ["s"], category: "time", equivalentValue: 1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{s}[#6dfc74]{to}[#dec64e]{hour}"], description: "-"},
+    {unit: "hour", symbols: ["h"], category: "time", equivalentValue: 3600, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hour}to[#dec64e]{s}"], description: "-"},
+    {unit: "minute", symbols: ["min", "minute"], category: "time", equivalentValue: 60, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{hour}to[#dec64e]{s}"], description: "-"},
+    {unit: "second", symbols: ["s"], category: "time", equivalentValue: 1, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{s}to[#dec64e]{hour}"], description: "-"},
+
+    //currency
+    //will be added when currency api returns value
+    //equivalent value will be for euro
 ]
 
 const formulasData = [
+    {displayName: "Error percentage", category: "general", subcategory: "experiment", description: "-", displayOperation: "b{err} = (b{theo} - b{exp})/b{theo}*100",
+    formulaElements: [
+        {symbol: "theo", name: "theo", operationToFind: "exp/(err/100+1)"},
+        {symbol: "exp", name: "exp", operationToFind: "(err/100+1)*theo"},
+        {symbol: "err", name: "err", operationToFind: "(exp-theo)/theo*100"},
+    ]},
     {displayName: "Velocity", category: "physics", subcategory: "motion", description: "-", displayOperation: "b{v} = b{x} * b{t}",
     formulaElements: [
         {symbol: "v", name: "velocity", operationToFind: "x*t"},
