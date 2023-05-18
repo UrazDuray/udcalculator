@@ -105,19 +105,19 @@ body{
     font-size: 50px;
 }
 
-.CustomVaraibleDivClass{
+.CustomVariableDivClass{
     display: inline-flex;
 }
 
-.CustomVaraibleDivStartAnimClass{
-    animation: CustomVaraibleDivStartAnim normal 0.2s;
+.CustomVariableDivStartAnimClass{
+    animation: CustomVariableDivStartAnim normal 0.2s;
 }
-.CustomVaraibleDivRemoveAnimClass{
-    animation: CustomVaraibleDivRemoveAnim normal 0.2s;
+.CustomVariableDivRemoveAnimClass{
+    animation: CustomVariableDivRemoveAnim normal 0.2s;
 }
 
 
-@keyframes CustomVaraibleDivStartAnim {
+@keyframes CustomVariableDivStartAnim {
     from {
         transform: translateX(-450px);
     }
@@ -126,7 +126,7 @@ body{
     }
 }
 
-@keyframes CustomVaraibleDivRemoveAnim {
+@keyframes CustomVariableDivRemoveAnim {
     from {
         transform: translateX(0);
     }

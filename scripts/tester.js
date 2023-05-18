@@ -6,6 +6,7 @@ const testList = [
     {functionName: "CalculatorOnInput", args: ["deg(2*pi)", false], expectedOutput: 360},
     {functionName: "CalculatorOnInput", args: ["1mtoinch", false], expectedOutput: 39.37007874015748},
     {functionName: "CalculatorOnInput", args: ["vec(1,2,3)", false], expectedOutput: "<1, 2, 3>"},
+    {functionName: "CalculatorOnInput", args: ["vec(1*5,2,3)", false], expectedOutput: "<5, 2, 3>"},
     {functionName: "CalculatorOnInput", args: ["sum(3,6)", false], expectedOutput: 18},
     {functionName: "CalculatorOnInput", args: ["<1,2,3>crossp<3,4,5>", false], expectedOutput: "<-2, 4, -2>"},
     {functionName: "CalculatorOnInput", args: ["<1,2,3>dotp<3,4,5>", false], expectedOutput: 26},
@@ -43,7 +44,7 @@ function TestAll(){
             succesfulTestCount++
         }
         else{
-            console.log("%cTest didn't pass!", "color: #db3b24;")
+            console.log(`%cTest ${i} didn't pass!`, "color: #db3b24;")
             test.output = testOutput[1]
             failedTests.push(test)
         }

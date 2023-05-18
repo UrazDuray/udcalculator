@@ -1,4 +1,3 @@
-let currentUnitsToColorize = []
 const resultSpanElement = document.getElementById("resultSpan")
 const additionalMenusElement = document.getElementById("AdditionalMenusDiv")
 let initialInputColor = resultSpanElement.style.color
@@ -24,8 +23,6 @@ if(packageMode){
 
 //temp
 const trigoRoundDecimal = 15
-
-//CalculatorInputDivElement.textContent = "<1,-2,3>crossp<1,5,7>"
 
 let calculatorCustomVariableId = 0
 let calculatorCustomVariables = [
@@ -77,11 +74,16 @@ function Calculation(input, outputHtmlColorized, customVariables){
     if(findVectorsOutput == undefined) { ThrowErrorCode("Incorrect use of vectors"); return }
     let [vectorsOrdered, indexesToIgnoreByArgSplitter] = findVectorsOutput
     
-    // Find orderedOperations
+    // Find Elements
+    let foundCustomVariables = []
+    let foundUnits = []
     orderedByParantheseArray.forEach(e => {
        const insideParanthese = input.slice(e[0]+1, e[1])
-       const operationsFound = FindOperations(insideParanthese, e[0]+1, customVariables)
-       if(operationsFound == undefined) { return }
+       const elementsFound = FindElements(insideParanthese, e[0]+1, customVariables)
+       if(elementsFound == undefined) { return }
+       const operationsFound = elementsFound.orderedOperations
+       foundCustomVariables = foundCustomVariables.concat(elementsFound.customVariables)
+       foundUnits = foundUnits.concat(elementsFound.units)
 
        operationsFound.forEach(e => {
             const duplicateOperation = orderedOperations.find(x => x.index == e.index)
@@ -108,7 +110,7 @@ function Calculation(input, outputHtmlColorized, customVariables){
     
     // Find numbers
     let numbersOrdered = FindNumbers(input, [...orderedOperations]).concat(vectorsOrdered)
-    let orderedOperationsAndNumbers = orderedOperations.concat(numbersOrdered)
+    let orderedOperationsAndNumbers = orderedOperations.concat(numbersOrdered).concat(foundCustomVariables).concat(foundUnits)
 
     //find arg splitters
     for (let i = 1; i < input.length; i++) {
@@ -123,20 +125,10 @@ function Calculation(input, outputHtmlColorized, customVariables){
     //sort it by index ascending order
     orderedOperationsAndNumbers = orderedOperationsAndNumbers.sort(({index:a}, {index:b}) => a-b)
     
-    //remove custom variables from ordered operations
-    let temp_orderedOperations = [...orderedOperations]
-    for (let i = 0; i < temp_orderedOperations.length; i++) {
-        const e = temp_orderedOperations[i];
-        if(e.customVariable == true){
-            orderedOperations.splice(orderedOperations.indexOf(e), 1)
-        }
-    }
-    
     // Check for negative numbers, roots, logs
     let t_OOAN2 = [...orderedOperationsAndNumbers] //t_OOAN2: temp_orderedOperationsAndNumbers
     for (let i = 0; i < t_OOAN2.length; i++) {
         const e = t_OOAN2[i];
-        
         if(e.operation == undefined){ continue }
         const nextElement = t_OOAN2[i+1]
         const prevElement = t_OOAN2[i-1]
@@ -169,16 +161,18 @@ function Calculation(input, outputHtmlColorized, customVariables){
     }
 
     const result = Calculate(input, [...orderedOperations], [...orderedOperationsAndNumbers])
-
     const colorizedInput = outputHtmlColorized ? ColorizeInput(input, [...orderedOperationsAndNumbers], customVariables) : undefined
     
     //Chronometer("main-calculator")
-    return {result: result, htmlColorized: colorizedInput, incorrectInput: incorrectInput, errorString: currentErrorString, calculateParameters: [input, orderedOperations, orderedOperationsAndNumbers]}
+    return {result: result, htmlColorized: colorizedInput, incorrectInput: incorrectInput,
+        errorString: currentErrorString,
+        calculateParameters: [input, orderedOperations, orderedOperationsAndNumbers],
+        customVariableDependencies: foundCustomVariables
+    }
 }
 
 function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
     input = input.substring(1, input.length-1) //remove ghost parantheses
-    currentUnitsToColorize = []
     let resultToReturn = input
     
     for (let i = 0; i < orderedOperations.length; i++) {
@@ -190,7 +184,7 @@ function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
 
         let currentOperationData = operationsData.find(x => x.operation == currentOperation.operation)
         let currentOperationApplianceType = currentOperationData.operationApplianceType
-    
+
         if(currentOperationData.category == "function"){
             let numsArray = []
             let argCounter = 1
@@ -273,47 +267,33 @@ function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
         }
         else if(currentOperationApplianceType == "numberOnLeft"){
             if(currentOperationData.category == "unitConversion"){
+                const prev2Element = orderedOperationsAndNumbers[currentOperationIndex - 2]
                 const prevElement = orderedOperationsAndNumbers[currentOperationIndex - 1]
-                if(prevElement == undefined || prevElement.number == undefined){ return }
                 const nextElement = orderedOperationsAndNumbers[currentOperationIndex + 1]
+                if((prevElement == undefined || prevElement.unit == undefined) || (nextElement == undefined || nextElement.unit == undefined)){ ThrowErrorCode("Missing unit"); return }
 
-                const unit2EndIndex = (nextElement != undefined) ? (nextElement.index) : (input.length)
-                const unit1StartIndex = prevElement.index + prevElement.number.toString().length
-                const unit2StartIndex = currentOperation.index + currentOperation.symbol.length
-
-                const unit1Symbol = input.substring(unit1StartIndex, currentOperation.index)
-                let unit2Symbol = input.substring(unit2StartIndex, unit2EndIndex)
-                unit2Symbol = unit2Symbol.replace(/[()]/g, '')
-
-                 // Find unit datas
-                let unit1Data
-                let unit2Data
-                let unitsFoundCounter = 0
-                for (let i = 0; i < unitsData.length; i++) {
-                    const e = unitsData[i];
-                    for (let a = 0; a < e.symbols.length; a++) {
-                        const symbol = e.symbols[a];
-                        if(symbol == unit1Symbol){
-                            unit1Data = e
-                            unitsFoundCounter++
-                        }
-                        if(symbol == unit2Symbol){
-                            unit2Data = e
-                            unitsFoundCounter++
-                        }
-                        if(unitsFoundCounter == 2){ break }   
-                    }
-                    if(unitsFoundCounter == 2){ break }
-                }
-
+                // Find unit datas
+                const unit1Data = unitsData.find(x => x.unit == prevElement.unit)
+                const unit2Data = unitsData.find(x => x.unit == nextElement.unit)
                 if(unit1Data == undefined || unit2Data == undefined){ ThrowErrorCode("Incorrect unit"); return}
-
-                currentUnitsToColorize.push({unit: unit1Data.unit, symbol: unit1Symbol, index: unit1StartIndex})
-                currentUnitsToColorize.push({unit: unit2Data.unit, symbol: unit2Symbol, index: unit2StartIndex})
                 
-                const result = ApplyConversion(unit1Data, unit2Data, prevElement.number)
-                orderedOperationsAndNumbers.splice(currentOperationIndex-1, 2, {number: result, index: currentOperationIndex - 1})
+                const result = ApplyConversion(unit1Data, unit2Data, prev2Element.number)
+                orderedOperationsAndNumbers.splice(currentOperationIndex-2, 4, {number: result, index: currentOperationIndex - 2})
                 resultToReturn = result
+
+                //#region old code
+                // const prev2Element = orderedOperationsAndNumbers[currentOperationIndex - 2]
+                // if(prev2Element == undefined || prev2Element.number == undefined){ return }
+                // const prevElement = orderedOperationsAndNumbers[currentOperationIndex - 1]
+                // const nextElement = orderedOperationsAndNumbers[currentOperationIndex + 1]
+
+                // const unit1Data = unitsData.find(x => x.unit == prevElement.unit)
+                // const unit2Data = unitsData.find(x => x.unit == nextElement.unit)
+                
+                // const result = ApplyConversion(unit1Data, unit2Data, prev2Element.number)
+                // orderedOperationsAndNumbers.splice(currentOperationIndex-1, 2, {number: result, index: currentOperationIndex - 1})
+                // resultToReturn = result
+                //#endregion
             }
             else{
                 const num1Element = orderedOperationsAndNumbers[currentOperationIndex - 1]
@@ -482,7 +462,7 @@ function ColorizeInput(input, orderedOperationsAndNumbers){
     input = input.substring(1, input.length-1)
     let indexShift = 0
 
-    let listToColorize = orderedOperationsAndNumbers.concat(currentUnitsToColorize)
+    let listToColorize = orderedOperationsAndNumbers
     listToColorize.sort(({index:a}, {index:b}) => a-b)
 
     for (let i = 0; i < listToColorize.length; i++) {
@@ -509,10 +489,10 @@ function ColorizeInput(input, orderedOperationsAndNumbers){
     return input
 }
 
-function FindOperations(input, indexShift, customVariables){
+function FindElements(input, indexShift, customVariables){
     if(input.length == 0){ return }
-    let orderedOperations = []
     
+    let temp_orderedOperations = []
     operationsData.forEach(e => {
         let temporaryInput = input
         while (true) {
@@ -521,13 +501,14 @@ function FindOperations(input, indexShift, customVariables){
             let index = symbolData[0]
             let symbolString = symbolData[1]
 
-            orderedOperations.push({operation: e.operation, index: index + indexShift - 1, symbol: symbolString, priority: e.priority}) //index + indexShift - 1: 1-> baştaki parantez için
+            temp_orderedOperations.push({operation: e.operation, index: index + indexShift - 1, symbol: symbolString, priority: e.priority}) //index + indexShift - 1: 1-> baştaki parantez için
             let symbolLength = symbolString.length
             temporaryInput = ReplaceWithPlaceHoldersAtIndex(temporaryInput, index, placeHolderChar, symbolLength)
         }
     });
 
     //find custom variables
+    let temp_customVariables = []
     customVariables.forEach(e => {
         let temporaryInput = input
         let tempShift = 0
@@ -538,54 +519,201 @@ function FindOperations(input, indexShift, customVariables){
 
             const customVariableData = customVariables.find(x => x.symbol == symbolString)
 
-            orderedOperations.push({number: customVariableData.value, symbol: symbolString, index: index + indexShift - 1 + tempShift, customVariable: true}) //index + indexShift - 1: 1-> baştaki parantez için
+            temp_customVariables.push({number: customVariableData.value, symbol: symbolString, index: index + indexShift - 1 + tempShift, customVariable: true, id: e.id}) //index + indexShift - 1: 1-> baştaki parantez için
             let symbolLength = symbolString.length
             temporaryInput = temporaryInput.substring(0, index) + temporaryInput.substring(index + symbolLength)
             tempShift += symbolLength
         }
     });
+    
+    //find units
+    let temp_units = []
+    unitsData.forEach(e => {
+        let temporaryInput = input
+        while (true) {
+            symbolData = CheckIfStringIncludesStringsInArray(temporaryInput, e.symbols)
+            if(symbolData == false){ break }
+            let index = symbolData[0]
+            let symbolString = symbolData[1]
+
+            temp_units.push({unit: e.unit, index: index + indexShift - 1, symbol: symbolString}) //index + indexShift - 1: 1-> baştaki parantez için
+            let symbolLength = symbolString.length
+            temporaryInput = ReplaceWithPlaceHoldersAtIndex(temporaryInput, index, placeHolderChar, symbolLength)
+        }
+    });
 
     // Check for collisions
-    let operationsToBeDeleted = []
-    let temp_orderedOperations = [...orderedOperations]
-    for (let i = 0; i < temp_orderedOperations.length; i++) {
-        const e = temp_orderedOperations[i];
-        const eLimits = [e.index, e.index + e.symbol.length]
-
-        if(operationsToBeDeleted.includes(e)){ continue }
-
-        for (let a = 0; a < temp_orderedOperations.length; a++) {
-            const eCompared = temp_orderedOperations[a];
-            const eComparedLimits = [eCompared.index, eCompared.index + eCompared.symbol.length]
-            if(e == eCompared || operationsToBeDeleted.includes(eCompared)){ continue }
-
-            if(eLimits[0] <= eComparedLimits[0] && eComparedLimits[1] <= eLimits[1]){
-                //remove ecompared
-                const indexToDelete = orderedOperations.indexOf(eCompared)
-                if(indexToDelete != -1){
-                    orderedOperations.splice(indexToDelete, 1)
-                    operationsToBeDeleted.push(eCompared)
-                }
-            }
-            else if(eComparedLimits[0] <= eLimits[0] && eLimits[1] <= eComparedLimits[1]){
-                //remove e
-                const indexToDelete = orderedOperations.indexOf(e)
-                if(indexToDelete != -1){
-                    orderedOperations.splice(indexToDelete, 1)
-                    operationsToBeDeleted.push(e)
-                }
-
-                break
-            }
-        }
-    }
+    const collisionResult = CheckForCollisions([temp_orderedOperations, temp_customVariables, temp_units])    
+    let orderedOperations = collisionResult[0]
 
     orderedOperations.sort((a, b) => {
         if(a.priority == b.priority){
             return a.index - b.index
         }
     })
-    return orderedOperations
+
+    return {orderedOperations: orderedOperations, customVariables: collisionResult[1], units: collisionResult[2]}
+}
+
+function FindUnits(orderedOperations, orderedOperationsAndNumbers, input){
+    input = input.substring(1, input.length-1) //remove ghost parantheses
+
+    for (let i = 0; i < orderedOperationsAndNumbers.length; i++) {
+        const currentOperation = orderedOperationsAndNumbers[i];
+        if(currentOperation.operation != "conversion") continue
+        const currentOperationIndex = orderedOperationsAndNumbers.indexOf(currentOperation)
+
+        const numberElement = (function () {
+            for (let i = currentOperationIndex - 1; i >= 0; i--) {
+                const e = orderedOperationsAndNumbers[i];
+                if(e.number != undefined){
+                    return e
+                }
+            }
+            return undefined
+        })()
+        
+        if(numberElement == undefined){ ThrowErrorCode("Missing number for conversion"); break }
+
+        const nextElement = orderedOperationsAndNumbers[currentOperationIndex + 1]
+
+        const unit1StartIndex = numberElement.index + numberElement.number.toString().length
+        const unit1EndIndex = currentOperation.index
+        const unit2StartIndex = unit1EndIndex + currentOperation.symbol.length
+        const unit2EndIndex = (nextElement != undefined) ? (nextElement.index) : (input.length)
+
+        const unit1Symbol = input.substring(unit1StartIndex, unit1EndIndex)
+        let unit2Symbol = input.substring(unit2StartIndex, unit2EndIndex)
+        unit2Symbol = unit2Symbol.replace(/[()]/g, '')
+
+        //remove operations between unit indexes
+        orderedOperations.forEach(op => {
+            const result1 = IndexCollisionChecker([op.index, op.index + op.symbol.length], [unit1StartIndex, unit1EndIndex])
+            if(result1 == 2) {
+                orderedOperations.splice(orderedOperations.indexOf(op), 1)
+                orderedOperationsAndNumbers.splice(orderedOperationsAndNumbers.indexOf(op), 1)
+            }
+            
+            const result2 = IndexCollisionChecker([op.index, op.index + op.symbol.length], [unit2StartIndex, unit2EndIndex])
+            if(result2 == 2) {
+                orderedOperations.splice(orderedOperations.indexOf(op), 1)
+                orderedOperationsAndNumbers.splice(orderedOperationsAndNumbers.indexOf(op), 1)
+            }
+        })
+        
+        // Find unit datas
+        let unit1Data
+        let unit2Data
+        let unitsFoundCounter = 0
+        for (let i = 0; i < unitsData.length; i++) {
+            const e = unitsData[i];
+            for (let a = 0; a < e.symbols.length; a++) {
+                const symbol = e.symbols[a];
+                if(symbol == unit1Symbol){
+                    unit1Data = e
+                    unitsFoundCounter++
+                }
+                if(symbol == unit2Symbol){
+                    unit2Data = e
+                    unitsFoundCounter++
+                }
+                if(unitsFoundCounter == 2){ break }   
+            }
+            if(unitsFoundCounter == 2){ break }
+        }
+
+        if(unit1Data == undefined || unit2Data == undefined){ ThrowErrorCode("Incorrect unit"); return}
+
+        orderedOperationsAndNumbers.push({unit: unit1Data.unit, symbol: unit1Symbol, index: unit1StartIndex})
+        orderedOperationsAndNumbers.push({unit: unit2Data.unit, symbol: unit2Symbol, index: unit2StartIndex})
+        i+=2
+    }
+    orderedOperationsAndNumbers = orderedOperationsAndNumbers.sort(({index:a}, {index:b}) => a-b)
+    console.log([...orderedOperationsAndNumbers], [...orderedOperations])
+
+    return [orderedOperations, orderedOperationsAndNumbers]
+}
+
+function CheckForCollisions(arrays){
+    //combine all arays
+    let arraysCombined = []
+    for (let i = 0; i < arrays.length; i++) {
+        const a = arrays[i];
+        arraysCombined = arraysCombined.concat(a)
+    }
+
+    let elementsToBeDeleted = []
+    let temp_arraysCombined = [...arraysCombined]
+    let removedIndexes = []
+    for (let i = 0; i < temp_arraysCombined.length; i++) {
+        const e = temp_arraysCombined[i];
+        const eLimits = [e.index, e.index + e.symbol.length]
+
+        if(elementsToBeDeleted.includes(e)){ continue }
+
+        for (let a = 0; a < temp_arraysCombined.length; a++) {
+            const eCompared = temp_arraysCombined[a];
+            const eComparedLimits = [eCompared.index, eCompared.index + eCompared.symbol.length]
+            if(e == eCompared || elementsToBeDeleted.includes(eCompared)){ continue }
+
+            const collisionCheckResult = IndexCollisionChecker(eLimits, eComparedLimits)
+            if(collisionCheckResult == 1){
+                //remove ecompared
+                const indexToDelete = arraysCombined.indexOf(eCompared)
+                if(indexToDelete != -1){
+                    elementsToBeDeleted.push(eCompared)
+                    removedIndexes.push(a)
+                }
+            }
+            else if(collisionCheckResult == 2){
+                //remove e
+                const indexToDelete = arraysCombined.indexOf(e)
+                if(indexToDelete != -1){
+                    elementsToBeDeleted.push(e)
+                    removedIndexes.push(i)
+                }
+
+                //bu olmamalı diye düşünüyorum (break)
+                //break 
+            }
+
+        }
+    }
+
+    let first1TotalLength = arrays[0].length
+    let first2TotalLength = arrays[1].length + first1TotalLength
+
+    let indexShifts = [-1, -1, -1]
+    removedIndexes.forEach(index => {
+        let indexData
+        if(index >= first2TotalLength){
+            indexData = [2, index - first2TotalLength]
+            indexShifts[2]++
+        }
+        else if(index >= first1TotalLength){
+            indexData = [1, index - first1TotalLength]
+            indexShifts[1]++
+        }
+        else{
+            indexData = [0, index]
+            indexShifts[0]++
+        }
+        // console.log("debug", index)
+        // console.log(arrays[indexData[0]][indexData[1]])
+        // console.log(arrays[indexData[0]][indexData[1] - indexShifts[indexData[0]]])
+        arrays[indexData[0]].splice(indexData[1] - indexShifts[indexData[0]], 1)
+    });
+
+    return arrays
+}
+
+function IndexCollisionChecker(limits1, limits2){
+    if(limits1[0] <= limits2[0] && limits2[1] <= limits1[1]){
+        return 1
+    }
+    if(limits2[0] <= limits1[0] && limits1[1] <= limits2[1]){
+        return 2
+    }
 }
 
 function FindVectors(input){
@@ -631,16 +759,6 @@ function FindVectors(input){
         
     }
     return [vectorsOrdered, commaIndexes]
-}
-
-// returns the inner limits
-function IndexCollisionChecker(limits1, limits2){
-    if(limits1[0] <= limits2[0] && limits2[1] <= limits1[1]){
-        return limits2
-    }
-    else if(limits2[0] <= limits1[0] && limits1[1] <= limits2[1]){
-        return limits1
-    }   
 }
 
 const functionsData = (function (){
@@ -1172,22 +1290,22 @@ function RestoreCursorPlace(divId) {
 }
 //#endregion
 
-//#region custom variables
+//#region Custom variables
 const CustomVariablesListDivElement = document.getElementById("CustomVariablesListDiv")
 
 function AddCustomVariable(){
     CustomVariablesListDivElement.innerHTML += `
-        <div id="CustomVariableDiv${calculatorCustomVariableId}" class="CustomVaraibleDivClass CustomVaraibleDivStartAnimClass">
-            <div spellcheck="false" contenteditable="true" oninput="CustomVariableOnInput(this.id, this.textContent)" id="CustomVaraibleSymbolInput${calculatorCustomVariableId}" class="CustomVariableInputClass" type="text"></div>
+        <div id="CustomVariableDiv${calculatorCustomVariableId}" class="CustomVariableDivClass CustomVariableDivStartAnimClass">
+            <div spellcheck="false" contenteditable="true" oninput="CustomVariableOnInput(this.id, this.textContent)" id="CustomVariableSymbolInput${calculatorCustomVariableId}" class="CustomVariableInputClass" type="text"></div>
             <span class="CustomVariableSpanClass">&nbsp=&nbsp</span>
-            <div spellcheck="false" contenteditable="true" oninput="CustomVariableOnInput(this.id, this.textContent)" id="CustomVaraibleValueInput${calculatorCustomVariableId}" class="CustomVariableInputClass" type="text"></div>
+            <div spellcheck="false" contenteditable="true" oninput="CustomVariableOnInput(this.id, this.textContent)" id="CustomVariableValueInput${calculatorCustomVariableId}" class="CustomVariableInputClass" type="text"></div>
             <button onclick="RemoveCustomVariable(${calculatorCustomVariableId})" class="CustomVariableDeleteButtonClass"></button>
             <div id="CustomVariableErrorDiv${calculatorCustomVariableId}" class="CustomVariableErrorDivClass"></div>
         </div>`
     
     const beforeLastElement = CustomVariablesListDivElement.children[CustomVariablesListDivElement.children.length-2]
-    if(beforeLastElement && beforeLastElement.classList.contains("CustomVaraibleDivStartAnimClass")){
-        beforeLastElement.classList.remove("CustomVaraibleDivStartAnimClass")
+    if(beforeLastElement && beforeLastElement.classList.contains("CustomVariableDivStartAnimClass")){
+        beforeLastElement.classList.remove("CustomVariableDivStartAnimClass")
     }
 
     calculatorCustomVariables.push({symbol: undefined, value: undefined, color: "#3f6ad9", id: calculatorCustomVariableId})
@@ -1198,19 +1316,35 @@ function EditLastCustomVariable(symbol, value){
     const lastVariableId = CustomVariablesListDivElement.children[CustomVariablesListDivElement.children.length-1].id
     const realId = lastVariableId.substring("CustomVariableDiv".length)
 
-    document.getElementById("CustomVaraibleSymbolInput" + realId).textContent = symbol
-    document.getElementById("CustomVaraibleValueInput" + realId).textContent = value
+    document.getElementById("CustomVariableSymbolInput" + realId).textContent = symbol
+    document.getElementById("CustomVariableValueInput" + realId).textContent = value
 
-    CustomVariableOnInput("CustomVaraibleSymbolInput" + realId, symbol)
-    CustomVariableOnInput("CustomVaraibleValueInput" + realId, symbol)
+    CustomVariableOnInput("CustomVariableSymbolInput" + realId, symbol)
+    CustomVariableOnInput("CustomVariableValueInput" + realId, symbol)
 }
 
 function CustomVariableOnInput(id){
-    realId = id.substring(id.indexOf("Input") + 5)
+    const realId = id.substring(id.indexOf("Input") + 5)
     let customVariableData = calculatorCustomVariables.find(x => x.id == realId)
     
-    const symbol = document.getElementById("CustomVaraibleSymbolInput" + realId).textContent
-    const value = document.getElementById("CustomVaraibleValueInput" + realId).textContent
+
+    const symbol = document.getElementById("CustomVariableSymbolInput" + realId).textContent
+    const valueInputElement = document.getElementById("CustomVariableValueInput" + realId)
+    const value = valueInputElement.textContent
+
+    //#region calculate the value of custom variable
+    SaveCursorPlace(id)
+    const calculationResult = Calculation(value, true, calculatorCustomVariables)
+
+    //check if var depends on itself
+    if(calculationResult.customVariableDependencies.find(x => x.id == realId)) { ThrowErrorCodeForVariables("A variable cannot depend on itself", realId); return }
+    //check incorrect input
+    if(calculationResult.incorrectInput) { ThrowErrorCodeForVariables(calculationResult.errorString, realId); return }
+    const valueResult = calculationResult.result
+    valueInputElement.innerHTML = calculationResult.htmlColorized
+    RestoreCursorPlace(id)
+
+    //#endregion
 
     //check for name
     if(!isNaN(symbol) && symbol != ""){ ThrowErrorCodeForVariables("Can't use a number as variable name", realId);  return}
@@ -1242,9 +1376,9 @@ function CustomVariableOnInput(id){
     customVariableData.symbol = symbol
     
     //check for content
-    if(value == ""){ ThrowErrorCodeForVariables("Variable must have a value", realId);  return }
-    if(isNaN(value)){ ThrowErrorCodeForVariables("Value of the variable must be a number", realId);  return }
-    customVariableData.value = parseFloat(value)
+    // if(value == ""){ ThrowErrorCodeForVariables("Variable must have a value", realId);  return }
+    // if(isNaN(value)){ ThrowErrorCodeForVariables("Value of the variable must be a number", realId);  return }
+    customVariableData.value = valueResult
 
     //check general
     if(customVariableData.symbol == "" || customVariableData.symbol == undefined){
@@ -1261,7 +1395,7 @@ function CustomVariableOnInput(id){
 }
 
 function RemoveCustomVariable(id){
-    document.getElementById("CustomVariableDiv" + id).classList.add("CustomVaraibleDivRemoveAnimClass")
+    document.getElementById("CustomVariableDiv" + id).classList.add("CustomVariableDivRemoveAnimClass")
     calculatorCustomVariables.splice(calculatorCustomVariables.indexOf(calculatorCustomVariables.find(x => x.id == id)), 1)
     setTimeout(() => {
         document.getElementById("CustomVariableDiv" + id).remove()
@@ -1832,6 +1966,7 @@ async function GetCurrencyData() {
     GenerateCurrencySelectBoxes()
     for (let i = 0; i < Object.keys(currencyValueData.eur).length; i++) {
         const key = Object.keys(currencyValueData.eur)[i]
+        if(["1inch", "ht"].includes(key)) continue
         const value = 1/currencyValueData.eur[key]
         unitsData.push({unit: key, symbols: [key], category: "currency", equivalentValue: value, color: "#dec64e", showInHelp: false},)   
     }
@@ -1962,14 +2097,14 @@ function RemoveFromSavedHistory(operation){
         if(operationHistory.length>operation){
             operationHistory.splice(operation,1)
         }else{
-            console.log("index historyde yok")
+            // console.log("index historyde yok")
         }
     }
     else if(typeof operation === "string"){             //operasyonun kendisiyle silmek istersen
         if(tempOperationHistory.indexOf(operation)!=-1){
             operationHistory.splice(tempOperationHistory.indexOf(operation),1)
         }else{
-            console.log("operasyon historyde yok")
+            // console.log("operasyon historyde yok")
         }
     }
     sessionStorage.setItem("operationHistory", JSON.stringify(operationHistory))
@@ -1978,7 +2113,7 @@ function RemoveFromSavedHistory(operation){
 document.addEventListener("keydown",(e)=>{   
     if(e.key=="s" && e.ctrlKey && CalculatorInputDivElement.matches(':focus')){   //ikinci kondisyon input fokuslumu die bakıo
         AddToSavedHistory(CalculatorInputDivElement.innerHTML,resultSpanElement.innerHTML)
-        console.log(GetSavedHistory())
+        // console.log(GetSavedHistory())
     }
 })
 

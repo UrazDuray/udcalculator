@@ -44,7 +44,7 @@ const operationsData = [
     {operation: "logarithm", symbols: ["log"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}log[#f73636]{y}","log[#f73636]{y}"], color: "#6dfc74", description: "x is base, y is argument. If there is no x it will be assumed as 10", priority: 6, vectorCountNeededForOperation: [0]},
     {operation: "ln", symbols: ["ln"], operationApplianceType: "numberOnRight", examples: ["ln[#f73636]{y}"], color: "#6dfc74", description: "Log with base as e", priority: 5, vectorCountNeededForOperation: [0]},
     {operation: "power", symbols: ["^"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}^[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 4, vectorCountNeededForOperation: [0]},
-    {operation: "root", symbols: ["R","ro", "root"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}root[#f73636]{y}", "[#36c1f7]{x}r[#f73636]{y}", "r[#f73636]{y}"], color: "#6dfc74", description: "x is index of root. If there is no x it will be assumed as 2", priority: 3, vectorCountNeededForOperation: [0]},
+    {operation: "root", symbols: ["r","ro", "root"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}root[#f73636]{y}", "[#36c1f7]{x}r[#f73636]{y}", "r[#f73636]{y}"], color: "#6dfc74", description: "x is index of root. If there is no x it will be assumed as 2", priority: 3, vectorCountNeededForOperation: [0]},
     {operation: "percentage", symbols: ["%"], operationApplianceType: "numberOnLeft", examples: ["[#36c1f7]{x}%"], color: "#36c1f7", description: "divides number by 100", priority: 2, vectorCountNeededForOperation: [0]},
     {operation: "multiply", symbols: ["*"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}*[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 2, vectorCountNeededForOperation: [0, 1]},
     {operation: "divide", symbols: ["/"], operationApplianceType: "twoNumbers", examples: ["[#36c1f7]{x}/[#f73636]{y}"], color: "#36c1f7", description: "-", priority: 2, vectorCountNeededForOperation: [0, 1]},
@@ -79,7 +79,6 @@ let unitsData = [
     {unit: "inch", symbols: ["inch"], category: "length", equivalentValue: 0.0254, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{inch}to[#dec64e]{m}"], description: "-"},
     {unit: "mile", symbols: ["mile"], category: "length", equivalentValue: 1609.344, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{mile}to[#dec64e]{m}"], description: "-"},
     
-
     //weight
         //metric
     {unit: "kilogram", symbols: ["kg"], category: "weight", equivalentValue: 1000, color: "#dec64e", examples: ["[#36c1f7]{x}[#dec64e]{kg}to[#dec64e]{g}"], description: "-"},
