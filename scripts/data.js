@@ -12,6 +12,7 @@ const operationsData = [
     {operation: "convertToVector", symbols: ["vec", "vector"], category: "function", examples: ["vec([#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z})"], color: "#6dfc74", description: "Different way of declaring vector", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 3},
     {operation: "sumOfRange", symbols: ["sum"], category: "function", examples: ["sum([#36c1f7]{x}, [#36c1f7]{y})"], color: "#6dfc74", description: "Sum between the range. Both ends are included", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 2},
     {operation: "randomOfRange", symbols: ["rand", "random"], category: "function", examples: ["rand([#36c1f7]{x}, [#36c1f7]{y})"], color: "#6dfc74", description: "Returns an integer between the range. Both ends are included.", priority: 10, vectorCountNeededForOperation: [0], argumentCount: 2},
+    {operation: "average", symbols: ["avg", "average"], category: "function", examples: ["avg([#36c1f7]{x}, [#36c1f7]{y})"], color: "#6dfc74", description: "Takes average of the parameters", priority: 10, vectorCountNeededForOperation: [0], argumentCount: "inf"},
 
     //vectors
     {operation: "crossProduct", symbols: ["crossp"], category: "vector", operationApplianceType: "twoNumbers", examples: ["<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>crossp<[#36c1f7]{x}, [#36c1f7]{y}, [#36c1f7]{z}>"], color: "#36c1f7", description: "Takes cross product of two vectors", priority: 9, vectorCountNeededForOperation: [2]},

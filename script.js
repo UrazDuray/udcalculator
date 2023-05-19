@@ -82,9 +82,14 @@ function Calculation(input, outputHtmlColorized, customVariables){
        const elementsFound = FindElements(insideParanthese, e[0]+1, customVariables)
        if(elementsFound == undefined) { return }
        const operationsFound = elementsFound.orderedOperations
-       foundCustomVariables = foundCustomVariables.concat(elementsFound.customVariables)
        foundUnits = foundUnits.concat(elementsFound.units)
 
+       foundCustomVariables.forEach(e => {
+            const duplicateCustomVariable = foundCustomVariables.find(x => x.index == e.index)
+            if(duplicateCustomVariable == undefined){
+                foundCustomVariables.push(e)
+            }
+       });
        operationsFound.forEach(e => {
             const duplicateOperation = orderedOperations.find(x => x.index == e.index)
             if(duplicateOperation == undefined){
@@ -189,14 +194,56 @@ function Calculate(input, orderedOperations, orderedOperationsAndNumbers){
             let numsArray = []
             let argCounter = 1
             let argIterator = 1
-            while(argCounter <= currentOperationData.argumentCount){
-                const num = orderedOperationsAndNumbers[currentOperationIndex + argIterator];
-                if(num == undefined){ ThrowErrorCode("Incorrect use of function"); return }
-                argIterator++
-                if(num.argSplitter) continue
-                numsArray.push(num.number)
-                argCounter++
+
+            const endParantheseIndex = (function (){
+                if(currentOperationData.argumentCount == "inf"){
+                    let startParantheses = 1
+                    let endParantheses = 0
+    
+                    let inputIterator = currentOperation.index + currentOperation.symbol.length + 1
+                    
+                    while (true) {
+                        const char = input[inputIterator]
+                        if(char == '(') startParantheses++
+                        else if (char == ')') endParantheses++
+                        if (startParantheses == endParantheses){
+                            return inputIterator
+                        }
+                        else{
+                            inputIterator++
+                        }
+                        if(inputIterator >= input.length) break
+                    }
+                }
+                else{
+                    return undefined
+                }
+            })()
+
+            if (endParantheseIndex == undefined){
+                while(argCounter <= currentOperationData.argumentCount){
+                    const num = orderedOperationsAndNumbers[currentOperationIndex + argIterator];
+                    if(num == undefined){ ThrowErrorCode("Incorrect use of function"); return }
+                    argIterator++
+                    if(num.argSplitter) continue
+                    numsArray.push(num.number)
+                    argCounter++
+                }
+            } 
+            else{
+                while(true){
+                    const nextNumIndex = currentOperationIndex + argIterator
+                    if (nextNumIndex >= orderedOperationsAndNumbers.length) break
+                    const num = orderedOperationsAndNumbers[nextNumIndex];
+                    if(num == undefined){ ThrowErrorCode("Incorrect use of function"); return }
+                    if(num.index >= endParantheseIndex){ break }
+                    argIterator++
+                    if(num.argSplitter) continue
+                    numsArray.push(num.number)
+                    argCounter++
+                }
             }
+
         
             const result = ApplyOperation(currentOperation, numsArray, false)
             let objectToAdd = {number: result, index: currentOperationIndex}
@@ -411,6 +458,14 @@ function ApplyOperation(operation, nums, vectorMode){
                 return SumOfRangeFunction(nums[0], nums[1])
             case "randomOfRange":
                 return RandomOfRangeFunction(nums[0], nums[1])
+            case "average": {
+                let total = 0
+                nums.forEach(e => {
+                    total += e
+                });
+                return total / nums.length
+            }
+                
             default:
                 return undefined
         }
@@ -463,8 +518,6 @@ function ColorizeInput(input, orderedOperationsAndNumbers){
     let indexShift = 0
 
     let listToColorize = orderedOperationsAndNumbers
-    listToColorize.sort(({index:a}, {index:b}) => a-b)
-
     for (let i = 0; i < listToColorize.length; i++) {
         const e = listToColorize[i];
         if(e.negativeNumber) continue

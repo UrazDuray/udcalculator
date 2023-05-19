@@ -8,6 +8,8 @@ const testList = [
     {functionName: "CalculatorOnInput", args: ["vec(1,2,3)", false], expectedOutput: "<1, 2, 3>"},
     {functionName: "CalculatorOnInput", args: ["vec(1*5,2,3)", false], expectedOutput: "<5, 2, 3>"},
     {functionName: "CalculatorOnInput", args: ["sum(3,6)", false], expectedOutput: 18},
+    {functionName: "CalculatorOnInput", args: ["avg(1)", false], expectedOutput: 1},
+    {functionName: "CalculatorOnInput", args: ["avg(1,2,3,4,5)", false], expectedOutput: 3},
     {functionName: "CalculatorOnInput", args: ["<1,2,3>crossp<3,4,5>", false], expectedOutput: "<-2, 4, -2>"},
     {functionName: "CalculatorOnInput", args: ["<1,2,3>dotp<3,4,5>", false], expectedOutput: 26},
     {functionName: "CalculatorOnInput", args: ["magvec(6,6,3)", false], expectedOutput: 9},
