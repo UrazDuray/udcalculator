@@ -30,6 +30,7 @@ const testList = [
     {functionName: "CalculatorOnInput", args: ["2/-5", false], expectedOutput: -0.4},
     {functionName: "CalculatorOnInput", args: ["3-5", false], expectedOutput: -2},
     {functionName: "CalculatorOnInput", args: ["5+2", false], expectedOutput: 7},    
+    {functionName: "TestCutomVariableDependencies", args: [], expectedOutput: "<8, 4, 4>"},    
 ]
 
 if(testAllOnStart) TestAll()
@@ -61,6 +62,20 @@ function TestAll(){
 
 function Test(functionName, args, expectedOutput){
     const output = window[functionName](...args)
+    RemoveAllCustomVariables()
     if(output == expectedOutput) return [true]
     return [false, output]
+}
+
+function TestCutomVariableDependencies(){
+    AddCustomVariable()
+    EditLastCustomVariable('za', '4')
+    AddCustomVariable()
+    EditLastCustomVariable('az', 'za*1')
+    AddCustomVariable()
+    EditLastCustomVariable('ba', 'az*1')
+    AddCustomVariable()
+    EditLastCustomVariable('ab', 'az*2')
+
+    return CalculatorOnInput('vec(ab*1, ba*1, az*1)', false)
 }

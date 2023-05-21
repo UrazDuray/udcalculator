@@ -26,8 +26,12 @@ const trigoRoundDecimal = 15
 
 let calculatorCustomVariableId = 0
 let calculatorCustomVariables = [
-    //{symbol: "x", value: 5, color: "#3f6ad9", id: 0}
+    //{symbol: "x", value: 5, color: "#3f6ad9", id: 0, dependencies: []},
 ]
+
+let calculatorCustomVariablesDependencyTree = {
+
+}
 
 // Vertical scroll counts as horizontal scroll too
 CalculatorInputDivElement.addEventListener('wheel', e => {
@@ -82,18 +86,20 @@ function Calculation(input, outputHtmlColorized, customVariables){
        const elementsFound = FindElements(insideParanthese, e[0]+1, customVariables)
        if(elementsFound == undefined) { return }
        const operationsFound = elementsFound.orderedOperations
+       const customVariablesFound = elementsFound.customVariables
        foundUnits = foundUnits.concat(elementsFound.units)
 
-       foundCustomVariables.forEach(e => {
-            const duplicateCustomVariable = foundCustomVariables.find(x => x.index == e.index)
+       customVariablesFound.forEach(a => {
+            const duplicateCustomVariable = foundCustomVariables.find(x => x.index == a.index)
             if(duplicateCustomVariable == undefined){
-                foundCustomVariables.push(e)
+                foundCustomVariables.push(a)
             }
        });
-       operationsFound.forEach(e => {
-            const duplicateOperation = orderedOperations.find(x => x.index == e.index)
+
+       operationsFound.forEach(a => {
+            const duplicateOperation = orderedOperations.find(x => x.index == a.index)
             if(duplicateOperation == undefined){
-                orderedOperations.push(e)
+                orderedOperations.push(a)
             }
        });
     });
@@ -672,9 +678,6 @@ function CheckForCollisions(arrays){
             indexData = [0, index]
             indexShifts[0]++
         }
-        // console.log("debug", index)
-        // console.log(arrays[indexData[0]][indexData[1]])
-        // console.log(arrays[indexData[0]][indexData[1] - indexShifts[indexData[0]]])
         arrays[indexData[0]].splice(indexData[1] - indexShifts[indexData[0]], 1)
     });
 
@@ -1282,7 +1285,7 @@ function AddCustomVariable(){
         beforeLastElement.classList.remove("CustomVariableDivStartAnimClass")
     }
 
-    calculatorCustomVariables.push({symbol: undefined, value: undefined, color: "#3f6ad9", id: calculatorCustomVariableId})
+    calculatorCustomVariables.push({symbol: undefined, value: undefined, color: "#3f6ad9", id: calculatorCustomVariableId, dependencies: []})
     calculatorCustomVariableId++
 }
 
@@ -1301,7 +1304,6 @@ function CustomVariableOnInput(id){
     const realId = id.substring(id.indexOf("Input") + 5)
     let customVariableData = calculatorCustomVariables.find(x => x.id == realId)
     
-
     const symbol = document.getElementById("CustomVariableSymbolInput" + realId).textContent
     const valueInputElement = document.getElementById("CustomVariableValueInput" + realId)
     const value = valueInputElement.textContent
@@ -1312,6 +1314,14 @@ function CustomVariableOnInput(id){
 
     //check if var depends on itself
     if(calculationResult.customVariableDependencies.find(x => x.id == realId)) { ThrowErrorCodeForVariables("A variable cannot depend on itself", realId); return }
+    
+    //Add dependencies
+    calculationResult.customVariableDependencies.forEach(e => {
+        if(customVariableData.dependencies.find(x => x.id == e.id) == undefined){
+            customVariableData.dependencies.push(e)
+        }
+    })
+
     //check incorrect input
     if(calculationResult.incorrectInput) { ThrowErrorCodeForVariables(calculationResult.errorString, realId); return }
     const valueResult = calculationResult.result
@@ -1364,8 +1374,54 @@ function CustomVariableOnInput(id){
         return
     }
 
+    //recalculate dependencies
+    RecalculateDependenciesFor(realId)
+
     ThrowErrorCodeForVariables("none", realId)
     ReCalculatorInput()
+}
+
+function RecalculateDependenciesFor(id){
+    const variablesNeedRecalculation = FindCustomVariableDependents(id)
+    variablesNeedRecalculation.forEach(e => {
+        RecalculateCustomVariable(e)
+    });
+    ReCalculatorInput()
+}
+
+//returns ids of dependents
+function FindCustomVariableDependents(id){
+    let dependents = []
+    let dependentsToSearch = [id]
+    let change = true
+    while (change){    
+        change = false
+        const currentId = dependentsToSearch[0]
+        dependentsToSearch.shift()
+        calculatorCustomVariables.forEach(e => {
+            e.dependencies.forEach(d => {
+                if(d.id == currentId && !dependents.includes(e.id)){
+                    dependents.push(e.id)
+                    dependentsToSearch.push(e.id)
+                    change = true
+                }
+            });
+        })
+        if(dependentsToSearch.length == 0) break
+    }
+    
+    return dependents
+}
+
+function RecalculateCustomVariable(id){
+    const currentText = document.getElementById("CustomVariableValueInput" + id).textContent
+    const calculatedValue = Calculation(currentText, true, calculatorCustomVariables).result
+    let customVariable = calculatorCustomVariables.find(x => x.id == id)
+    const oldNumber = customVariable.value
+    if(oldNumber == calculatedValue) return false
+
+    customVariable.value = calculatedValue
+    return true
 }
 
 function RemoveCustomVariable(id){
@@ -1375,6 +1431,11 @@ function RemoveCustomVariable(id){
         document.getElementById("CustomVariableDiv" + id).remove()
     }, 200);
     ReCalculatorInput()
+}
+
+function RemoveAllCustomVariables(){
+    calculatorCustomVariables = []
+    CustomVariablesListDivElement.innerHTML = ""
 }
 
 function ThrowErrorCodeForVariables(errorString, id){
@@ -1901,7 +1962,6 @@ function CalculateResistorFromValue(){
     }
 
     resistorLatestEdit = "value"
-    //console.log(band1, band2, band3, multiplierBand, toleranceBand, tempCoeffBand)
 }
 
 const CompactNumberEquivalentValues = {
@@ -2071,14 +2131,14 @@ function RemoveFromSavedHistory(operation){
         if(operationHistory.length>operation){
             operationHistory.splice(operation,1)
         }else{
-            // console.log("index historyde yok")
+            // .log("index historyde yok")
         }
     }
     else if(typeof operation === "string"){             //operasyonun kendisiyle silmek istersen
         if(tempOperationHistory.indexOf(operation)!=-1){
             operationHistory.splice(tempOperationHistory.indexOf(operation),1)
         }else{
-            // console.log("operasyon historyde yok")
+            // .log("operasyon historyde yok")
         }
     }
     sessionStorage.setItem("operationHistory", JSON.stringify(operationHistory))
@@ -2087,7 +2147,7 @@ function RemoveFromSavedHistory(operation){
 document.addEventListener("keydown",(e)=>{   
     if(e.key=="s" && e.ctrlKey && CalculatorInputDivElement.matches(':focus')){   //ikinci kondisyon input fokuslumu die bakıo
         AddToSavedHistory(CalculatorInputDivElement.innerHTML,resultSpanElement.innerHTML)
-        // console.log(GetSavedHistory())
+        // .log(GetSavedHistory())
     }
 })
 

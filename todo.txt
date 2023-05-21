@@ -4,14 +4,12 @@ To do:
 - calculations history
 - notification sağ alttan gelsin
 - notification yandan gözüküyor bug düzelt
-- calculation inside variable value
 - add hsl to color picker
 - add favorite colors
 - formula için daha kolay bir yol
 - formula ui geliştir
 - start plotter script after plotter menu is opened
 - add tabs for calculator
-- Fix unit detection
 
 functions:
 - vecrossp problemi
@@ -20,3 +18,4 @@ Added:
 - add formulas
 - add currency conversion to main calculator
 - add error % formula
+- calculation inside variable value
