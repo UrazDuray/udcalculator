@@ -594,6 +594,7 @@ function FindElements(input, indexShift, customVariables){
             if(symbolData == false){ break }
             let index = symbolData[0]
             let symbolString = symbolData[1]
+            console.log(symbolString)
 
             temp_units.push({unit: e.unit, index: index + indexShift - 1, symbol: symbolString}) //index + indexShift - 1: 1-> baştaki parantez için
             let symbolLength = symbolString.length
@@ -2000,7 +2001,7 @@ async function GetCurrencyData() {
     GenerateCurrencySelectBoxes()
     for (let i = 0; i < Object.keys(currencyValueData.eur).length; i++) {
         const key = Object.keys(currencyValueData.eur)[i]
-        if(["1inch", "ht"].includes(key)) continue
+        if(["1inch", "ht", "00"].includes(key)) continue
         const value = 1/currencyValueData.eur[key]
         unitsData.push({unit: key, symbols: [key], category: "currency", equivalentValue: value, color: "#dec64e", showInHelp: false},)   
     }

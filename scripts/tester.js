@@ -1,5 +1,6 @@
 // Must run the tester before committing
 const testList = [
+    {functionName: "CalculatorOnInput", args: ["2700/4", false], expectedOutput: 675},
     {functionName: "CalculatorOnInput", args: ["prime31", false], expectedOutput: 1},
     {functionName: "CalculatorOnInput", args: ["prime278933", false], expectedOutput: 0},
     {functionName: "CalculatorOnInput", args: ["degpi", false], expectedOutput: 180},

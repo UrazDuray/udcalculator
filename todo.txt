@@ -10,6 +10,9 @@ To do:
 - formula ui geliştir
 - start plotter script after plotter menu is opened
 - add tabs for calculator
+- thread chart
+- zortoztoml düzelt
+- 1/inf düzelt
 
 functions:
 - vecrossp problemi
