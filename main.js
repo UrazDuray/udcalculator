@@ -37,7 +37,7 @@ const createWindow = () => {
   win.removeMenu()
   
   // DevTools'u aç.
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
 };
 
 app.whenReady().then(() => {

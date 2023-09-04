@@ -87,7 +87,7 @@ function Calculation(input, outputHtmlColorized, customVariables){
        if(elementsFound == undefined) { return }
        const operationsFound = elementsFound.orderedOperations
        const customVariablesFound = elementsFound.customVariables
-       foundUnits = foundUnits.concat(elementsFound.units)
+       const unitsFound = elementsFound.units
 
        customVariablesFound.forEach(a => {
             const duplicateCustomVariable = foundCustomVariables.find(x => x.index == a.index)
@@ -102,7 +102,15 @@ function Calculation(input, outputHtmlColorized, customVariables){
                 orderedOperations.push(a)
             }
        });
+
+       unitsFound.forEach(a => {
+            const duplicateUnit = foundUnits.find(x => x.index == a.index)
+            if(duplicateUnit == undefined){
+                foundUnits.push(a)
+            }
+        });
     });
+    
 
     // Remove operations inside vectors
     const temp_orderedOperationsForVectors = [...orderedOperations]
@@ -594,7 +602,6 @@ function FindElements(input, indexShift, customVariables){
             if(symbolData == false){ break }
             let index = symbolData[0]
             let symbolString = symbolData[1]
-            console.log(symbolString)
 
             temp_units.push({unit: e.unit, index: index + indexShift - 1, symbol: symbolString}) //index + indexShift - 1: 1-> baştaki parantez için
             let symbolLength = symbolString.length
